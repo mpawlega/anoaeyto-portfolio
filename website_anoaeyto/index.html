@@ -3,24 +3,759 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>anoeyto-home</title>
-    <link rel="stylesheet" href="style.css">
+    <title>Your Name - Portfolio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-image: url('bg1.png');
+            background-size: cover;
+            background-position: center bottom;
+            background-attachment: fixed;
+            filter: blur(8px);
+            z-index: -2;
+        }
+        
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(to bottom, 
+                rgba(0, 0, 0, 1) 0%, 
+                rgba(0, 0, 0, 0.8) 30%, 
+                rgba(0, 0, 0, 0.3) 70%, 
+                rgba(0, 0, 0, 0) 100%);
+            z-index: -1;
+        }
+        
+        .enter-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 1s ease, transform 1s ease;
+        }
+        
+        .enter-screen::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://placeholder-image-url.jpg');
+            background-size: cover;
+            background-position: center;
+            transition: filter 0.3s ease;
+            z-index: 1;
+        }
+        
+        .enter-screen.blur::before {
+            filter: blur(10px);
+        }
+        
+        .enter-screen.hidden::before {
+            filter: blur(20px);
+        }
+        
+        .enter-screen.hidden {
+            opacity: 0;
+            transform: scale(1.2);
+            pointer-events: none;
+        }
+        
+        .enter-screen h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+            font-weight: 300;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+            transition: filter 0.3s ease;
+        }
+        
+        .enter-screen p {
+            font-size: 3em;
+            margin-bottom: 40px;
+            letter-spacing: 3px;
+            font-weight: 300;
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+            transition: filter 0.3s ease;
+        }
+        
+        .enter-screen.blur h1,
+        .enter-screen.blur p {
+            filter: blur(5px);
+        }
+        
+        .enter-screen.hidden h1,
+        .enter-screen.hidden p {
+            filter: blur(10px);
+        }
+        
+        .enter-button {
+            padding: 15px 40px;
+            font-size: 1em;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            border: 1px solid #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 2px;
+            backdrop-filter: blur(5px);
+            position: relative;
+            z-index: 10;
+        }
+        
+        .enter-button:hover {
+            background-color: rgba(255, 255, 255, 0.9);
+            color: #000;
+            transform: scale(1.1);
+        }
+        
+        .enter-content {
+            position: relative;
+            z-index: 10;
+        }
+        
+        .enter-button:hover {
+            background-color: #fff;
+            color: #000;
+        }
+        
+        .main-content {
+            opacity: 0;
+            transition: opacity 1s ease 0.5s;
+        }
+        
+        .main-content.visible {
+            opacity: 1;
+        }
+        
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            border-bottom: 1px solid #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+        
+        .header-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #333;
+        }
+        
+        .header-text h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header-text p {
+            font-size: 1.2em;
+            color: #aaa;
+        }
+        
+        section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+        
+        h2 {
+            font-size: 2em;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .gallery {
+            display: flex;
+            flex-direction: column;
+            gap: 60px;
+        }
+        
+        .gallery-row {
+            width: 100%;
+        }
+        
+        .gallery-row h3 {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+            color: #aaa;
+            text-align: left;
+        }
+        
+        /* Rotating images grid */
+        .rotating-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 100%;
+        }
+        
+        .rotating-item {
+            width: 100%;
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #333;
+        }
+        
+        .rotating-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        
+        .rotating-item img.active {
+            opacity: 1;
+        }
+        
+        /* Projects row with cards */
+        .projects-container {
+            overflow-x: auto;
+            overflow-y: hidden;
+            padding-bottom: 20px;
+            scrollbar-width: thin;
+            scrollbar-color: #333 #000;
+        }
+        
+        .projects-container::-webkit-scrollbar {
+            height: 8px;
+        }
+        
+        .projects-container::-webkit-scrollbar-track {
+            background: #000;
+        }
+        
+        .projects-container::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 4px;
+        }
+        
+        .projects-track {
+            display: flex;
+            gap: 20px;
+            padding-bottom: 10px;
+        }
+        
+        .project-card {
+            flex-shrink: 0;
+            width: 350px;
+            background-color: #111;
+            border: 1px solid #333;
+            cursor: pointer;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .project-card:hover {
+            transform: translateY(-5px);
+            border-color: #666;
+        }
+        
+        .project-card img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            display: block;
+        }
+        
+        .project-info {
+            padding: 20px;
+        }
+        
+        .project-info h4 {
+            font-size: 1.3em;
+            margin-bottom: 10px;
+        }
+        
+        .project-info p {
+            color: #aaa;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        
+        /* Modal for project details */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 2000;
+            overflow-y: auto;
+        }
+        
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: #111;
+            border: 1px solid #333;
+            max-width: 800px;
+            width: 90%;
+            margin: 40px;
+            position: relative;
+        }
+        
+        .modal-content img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+        }
+        
+        .modal-body {
+            padding: 30px;
+        }
+        
+        .modal-body h3 {
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+        
+        .modal-body p {
+            color: #ccc;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2em;
+            color: #fff;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 10px;
+            line-height: 1;
+            transition: color 0.3s ease;
+        }
+        
+        .close-modal:hover {
+            color: #aaa;
+        }
+        
+        .about-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 40px;
+            align-items: start;
+        }
+        
+        .about-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border: 1px solid #333;
+        }
+        
+        .about-text {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .about-content p {
+            margin-bottom: 20px;
+            font-size: 1.1em;
+            color: #ccc;
+            text-align: left;
+        }
+        
+        @media (max-width: 768px) {
+            .about-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            
+            .about-image {
+                height: 300px;
+            }
+        }
+        
+        .software-section {
+            margin-top: 50px;
+            padding-top: 40px;
+            border-top: 1px solid #333;
+        }
+        
+        .software-section h3 {
+            font-size: 1.5em;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .software-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .software-item {
+            background-color: #111;
+            border: 1px solid #333;
+            padding: 15px 20px;
+            text-align: center;
+            font-size: 1em;
+            color: #ccc;
+            transition: border-color 0.3s ease;
+        }
+        
+        .software-item:hover {
+            border-color: #666;
+        }
+        
+        .contact-content {
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        
+        .contact-content p {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+        }
+        
+        .contact-content a {
+            color: #fff;
+            text-decoration: none;
+            border-bottom: 1px solid #fff;
+        }
+        
+        .contact-content a:hover {
+            color: #aaa;
+            border-bottom-color: #aaa;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 1px solid #333;
+            color: #666;
+        }
+    </style>
 </head>
-<body></body>
+<body>
+    <div class="enter-screen" id="enterScreen">
+        <h1>hello, this is</h1>
+        <p>anoaeyto</p>
+        <button class="enter-button" onclick="enterSite()">enter</button>
+    </div>
 
-   <ul>
-  <li><a href="index.html">Home</a></li>
-  <li><a href="works.html">Works</a></li>
-  <li><a href="contact.html">Contact</a></li>
-  <li><a href="about.html">About</a></li>
-</ul>
+    <div class="main-content" id="mainContent">
+    <header>
+        <img src="https://via.placeholder.com/200/222/fff?text=Your+Photo" alt="Your Name" class="header-image">
+        <div class="header-text">
+            <h1>Your Name</h1>
+            <p>Designer | Artist | Developer</p>
+        </div>
+    </header>
 
-    <h1>Hello! This is anoaeyto</h1>
-       <p>This is my website.</p>
- 
-    <p>@anoaeyto 2025</p>
+    <section id="about">
+        <h2>About</h2>
+        <div class="about-content">
+            <p>I'm a creative professional specializing in design, UX, and game development. With expertise in visual storytelling and interactive experiences, I bring ideas to life through thoughtful design and technical execution.</p>
+            <p>My work spans across digital art, user interface design, 3D modeling, and creative coding. I'm passionate about creating experiences that are both beautiful and functional.</p>
+            
+            <div class="software-section">
+                <h3>Software & Tools</h3>
+                <div class="software-grid">
+                    <div class="software-item">Adobe Photoshop</div>
+                    <div class="software-item">Adobe Illustrator</div>
+                    <div class="software-item">Figma</div>
+                    <div class="software-item">Blender</div>
+                    <div class="software-item">Unreal Engine</div>
+                    <div class="software-item">Framer</div>
+                    <div class="software-item">After Effects</div>
+                    <div class="software-item">TouchDesigner</div>
+                </div>
+            </div>
+        </div>
+    </section>
 
+    <section id="gallery">
+        <h2>Gallery</h2>
+        <div class="gallery">
+            <!-- Row 1: Rotating images grid -->
+            <div class="gallery-row">
+                <h3>Recent Work</h3>
+                <div class="rotating-grid">
+                    <div class="rotating-item" data-slot="0">
+                        <img src="https://via.placeholder.com/300x200/222/fff?text=Image+1" class="active" alt="Image 1">
+                        <img src="https://via.placeholder.com/300x200/333/fff?text=Image+A" alt="Image A">
+                        <img src="https://via.placeholder.com/300x200/444/fff?text=Image+X" alt="Image X">
+                    </div>
+                    <div class="rotating-item" data-slot="1">
+                        <img src="https://via.placeholder.com/300x200/222/fff?text=Image+2" class="active" alt="Image 2">
+                        <img src="https://via.placeholder.com/300x200/333/fff?text=Image+B" alt="Image B">
+                        <img src="https://via.placeholder.com/300x200/444/fff?text=Image+Y" alt="Image Y">
+                    </div>
+                    <div class="rotating-item" data-slot="2">
+                        <img src="https://via.placeholder.com/300x200/222/fff?text=Image+3" class="active" alt="Image 3">
+                        <img src="https://via.placeholder.com/300x200/333/fff?text=Image+C" alt="Image C">
+                        <img src="https://via.placeholder.com/300x200/444/fff?text=Image+Z" alt="Image Z">
+                    </div>
+                    <div class="rotating-item" data-slot="3">
+                        <img src="https://via.placeholder.com/300x200/222/fff?text=Image+4" class="active" alt="Image 4">
+                        <img src="https://via.placeholder.com/300x200/333/fff?text=Image+D" alt="Image D">
+                        <img src="https://via.placeholder.com/300x200/444/fff?text=Image+W" alt="Image W">
+                    </div>
+                    <div class="rotating-item" data-slot="4">
+                        <img src="https://via.placeholder.com/300x200/222/fff?text=Image+5" class="active" alt="Image 5">
+                        <img src="https://via.placeholder.com/300x200/333/fff?text=Image+E" alt="Image E">
+                        <img src="https://via.placeholder.com/300x200/444/fff?text=Image+V" alt="Image V">
+                    </div>
+                    <div class="rotating-item" data-slot="5">
+                        <img src="https://via.placeholder.com/300x200/222/fff?text=Image+6" class="active" alt="Image 6">
+                        <img src="https://via.placeholder.com/300x200/333/fff?text=Image+F" alt="Image F">
+                        <img src="https://via.placeholder.com/300x200/444/fff?text=Image+U" alt="Image U">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 2: Clickable project cards -->
+            <div class="gallery-row">
+                <h3>Featured Projects</h3>
+                <div class="projects-container">
+                    <div class="projects-track">
+                        <div class="project-card" onclick="openModal(0)">
+                            <img src="https://via.placeholder.com/350x250/222/fff?text=Project+1" alt="Project 1">
+                            <div class="project-info">
+                                <h4>Project Title 1</h4>
+                                <p>Click to see more details</p>
+                            </div>
+                        </div>
+                        <div class="project-card" onclick="openModal(1)">
+                            <img src="https://via.placeholder.com/350x250/222/fff?text=Project+2" alt="Project 2">
+                            <div class="project-info">
+                                <h4>Project Title 2</h4>
+                                <p>Click to see more details</p>
+                            </div>
+                        </div>
+                        <div class="project-card" onclick="openModal(2)">
+                            <img src="https://via.placeholder.com/350x250/222/fff?text=Project+3" alt="Project 3">
+                            <div class="project-info">
+                                <h4>Project Title 3</h4>
+                                <p>Click to see more details</p>
+                            </div>
+                        </div>
+                        <div class="project-card" onclick="openModal(3)">
+                            <img src="https://via.placeholder.com/350x250/222/fff?text=Project+4" alt="Project 4">
+                            <div class="project-info">
+                                <h4>Project Title 4</h4>
+                                <p>Click to see more details</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 3: Rotating images grid -->
+            <div class="gallery-row">
+                <h3>More Work</h3>
+                <div class="rotating-grid">
+                    <div class="rotating-item" data-slot="6">
+                        <img src="https://via.placeholder.com/300x200/222/fff?text=Image+7" class="active" alt="Image 7">
+                        <img src="https://via.placeholder.com/300x200/333/fff?text=Image+G" alt="Image G">
+                        <img src="https://via.placeholder.com/300x200/444/fff?text=Image+T" alt="Image T">
+                    </div>
+                    <div class="rotating-item" data-slot="7">
+                        <img src="https://via.placeholder.com/300x200/222/fff?text=Image+8" class="active" alt="Image 8">
+                        <img src="https://via.placeholder.com/300x200/333/fff?text=Image+H" alt="Image H">
+                        <img src="https://via.placeholder.com/300x200/444/fff?text=Image+S" alt="Image S">
+                    </div>
+                    <div class="rotating-item" data-slot="8">
+                        <img src="https://via.placeholder.com/300x200/222/fff?text=Image+9" class="active" alt="Image 9">
+                        <img src="https://via.placeholder.com/300x200/333/fff?text=Image+I" alt="Image I">
+                        <img src="https://via.placeholder.com/300x200/444/fff?text=Image+R" alt="Image R">
+                    </div>
+                    <div class="rotating-item" data-slot="9">
+                        <img src="https://via.placeholder.com/300x200/222/fff?text=Image+10" class="active" alt="Image 10">
+                        <img src="https://via.placeholder.com/300x200/333/fff?text=Image+J" alt="Image J">
+                        <img src="https://via.placeholder.com/300x200/444/fff?text=Image+Q" alt="Image Q">
+                    </div>
+                    <div class="rotating-item" data-slot="10">
+                        <img src="https://via.placeholder.com/300x200/222/fff?text=Image+11" class="active" alt="Image 11">
+                        <img src="https://via.placeholder.com/300x200/333/fff?text=Image+K" alt="Image K">
+                        <img src="https://via.placeholder.com/300x200/444/fff?text=Image+P" alt="Image P">
+                    </div>
+                    <div class="rotating-item" data-slot="11">
+                        <img src="https://via.placeholder.com/300x200/222/fff?text=Image+12" class="active" alt="Image 12">
+                        <img src="https://via.placeholder.com/300x200/333/fff?text=Image+L" alt="Image L">
+                        <img src="https://via.placeholder.com/300x200/444/fff?text=Image+O" alt="Image O">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal for project details -->
+    <div class="modal" id="projectModal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()">&times;</button>
+            <img id="modalImage" src="" alt="">
+            <div class="modal-body">
+                <h3 id="modalTitle"></h3>
+                <p id="modalDescription"></p>
+            </div>
+        </div>
+    </div>
+
+    <section id="about">
+        <h2>About</h2>
+        <div class="about-content">
+            <p>I'm a creative professional specializing in design, UX, and game development. With expertise in visual storytelling and interactive experiences, I bring ideas to life through thoughtful design and technical execution.</p>
+            <p>My work spans across digital art, user interface design, 3D modeling, and creative coding. I'm passionate about creating experiences that are both beautiful and functional.</p>
+        </div>
+    </section>
+
+    <section id="contact">
+        <h2>Contact</h2>
+        <div class="contact-content">
+            <p>Email: <a href="mailto:your.email@example.com">your.email@example.com</a></p>
+            <p>LinkedIn: <a href="https://linkedin.com/in/yourprofile" target="_blank">linkedin.com/in/yourprofile</a></p>
+            <p>GitHub: <a href="https://github.com/yourusername" target="_blank">github.com/yourusername</a></p>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 Your Name. All rights reserved.</p>
+    </footer>
+    </div>
+
+    <script>
+        const enterScreen = document.getElementById('enterScreen');
+        const enterButton = document.querySelector('.enter-button');
+        
+        enterButton.addEventListener('mouseenter', function() {
+            enterScreen.classList.add('blur');
+        });
+        
+        enterButton.addEventListener('mouseleave', function() {
+            enterScreen.classList.remove('blur');
+        });
+        
+        function enterSite() {
+            document.getElementById('enterScreen').classList.add('hidden');
+            document.getElementById('mainContent').classList.add('visible');
+        }
+        
+        // Project data
+        const projects = [
+            {
+                title: "Project Title 1",
+                image: "https://via.placeholder.com/800x400/222/fff?text=Project+1",
+                description: "This is a detailed description of Project 1. Here you can explain the concept, tools used, challenges faced, and outcomes. Add as much detail as you want about this project."
+            },
+            {
+                title: "Project Title 2",
+                image: "https://via.placeholder.com/800x400/222/fff?text=Project+2",
+                description: "This is a detailed description of Project 2. Describe the creative process, technical aspects, and what makes this project unique."
+            },
+            {
+                title: "Project Title 3",
+                image: "https://via.placeholder.com/800x400/222/fff?text=Project+3",
+                description: "This is a detailed description of Project 3. Talk about your inspiration, methodology, and the final result of this work."
+            },
+            {
+                title: "Project Title 4",
+                image: "https://via.placeholder.com/800x400/222/fff?text=Project+4",
+                description: "This is a detailed description of Project 4. Share the story behind this project and what you learned from creating it."
+            }
+        ];
+        
+        function openModal(index) {
+            const modal = document.getElementById('projectModal');
+            const project = projects[index];
+            
+            document.getElementById('modalImage').src = project.image;
+            document.getElementById('modalTitle').textContent = project.title;
+            document.getElementById('modalDescription').textContent = project.description;
+            
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeModal() {
+            const modal = document.getElementById('projectModal');
+            modal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Close modal when clicking outside
+        document.getElementById('projectModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+        
+        // Rotating gallery images
+        function rotateImages() {
+            const items = document.querySelectorAll('.rotating-item');
+            
+            items.forEach((item, index) => {
+                const images = item.querySelectorAll('img');
+                const currentActive = item.querySelector('img.active');
+                const currentIndex = Array.from(images).indexOf(currentActive);
+                const nextIndex = (currentIndex + 1) % images.length;
+                
+                // Fade out current
+                currentActive.classList.remove('active');
+                
+                // Fade in next
+                images[nextIndex].classList.add('active');
+            });
+        }
+        
+        // Rotate images every 3 seconds
+        setInterval(rotateImages, 3000);
+    </script>
 </body>
 </html>
-
-
