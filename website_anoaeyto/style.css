@@ -38,20 +38,23 @@ body.no-scroll {
     justify-content: center;
     align-items: center;
     z-index: 1000;
-    transition: opacity 1.4s ease, transform 1.4s ease;
-    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,1) 100%), 
-                linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 1.4s ease, transform 1.4s ease, visibility 0s 0s;
+    background-color: #000;
+    /*background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,1) 100%), 
+                linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%); */
 }
 
 .enter-screen::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,1) 100%),
-                url("images/gallery/bg1.png");
+    /* background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.35) 55%, rgba(0,0,0,1) 100%),
+                url("images/gallery/bg2.png"); */
     background-size: cover;
     background-position: center;
-    transition: filter 0.8s ease, opacity 1.6s ease;
+    transition: filter 0.4s ease, opacity 1s ease;
     z-index: 1;
 }
 
@@ -83,6 +86,8 @@ body.no-scroll {
 .enter-screen.hidden {
     opacity: 0;
     transform: scale(1.1);
+    visibility: hidden;
+    transition: opacity 1.4s ease, transform 1.4s ease, visibility 0s 1.4s;
     pointer-events: none;
 }
 
@@ -117,11 +122,14 @@ body.no-scroll {
 
 .main-content {
     opacity: 0;
-    transition: opacity 1.2s ease 0.5s;
+    visibility: hidden;
+    transition: opacity 1.2s ease 0.5s, visibility 0s 1.7s;
 }
 
 .main-content.visible {
     opacity: 1;
+    visibility: visible;
+    transition: opacity 1.2s ease 0.5s, visibility 0s 0s;
 }
 
 /* ================= HERO ================= */
@@ -137,27 +145,52 @@ body.no-scroll {
     align-items: center;
     overflow: hidden;
     background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+    filter: blur(0px);
+    mask-image: linear-gradient(to bottom, 
+        rgba(0,0,0,1) 85%, 
+        rgba(0,0,0,1) 90%, 
+        rgba(0,0,0,0.3) 95%, 
+        rgba(0,0,0,0) 100%);
+    -webkit-mask-image: linear-gradient(to bottom, 
+        rgba(0,0,0,1) 85%, 
+        rgba(0,0,0,1) 90%, 
+        rgba(0,0,0,0.3) 95%, 
+        rgba(0,0,0,0) 100%);
 }
+
 
 .hero::before {
     content: '';
     position: absolute;
-    left: -10%;
-    right: -10%;
-    top: -10%;
-    bottom: -10%;
+    inset: 0;
+    width: 100%;
+    height: 100%;
     background-image: url('images/gallery/bg1.png');
     background-size: cover;
     background-position: center center;
     background-repeat: no-repeat;
     filter: blur(5px);
     z-index: 1;
+    transform: scale(1.3);
+    transition: transform 2s ease-out;
+}
+
+.main-content.visible .hero::before {
+    transform: scale(1);
 }
 
 .hero-content {
     position: relative;
     z-index: 3;
     text-align: center;
+    transform: scale(1.5);
+    opacity: 0;
+    transition: transform 2s ease-out, opacity 1.5s ease-out;
+}
+
+.main-content.visible .hero-content {
+    transform: scale(1);
+    opacity: 1;
 }
 
 .hero h1 {
@@ -214,7 +247,7 @@ h2 {
 
 .divider {
     border-top: 1px solid #333;
-    margin-bottom: 50px;
+    margin-bottom: 30px;
 }
 
 /* ================= ABOUT ================= */
@@ -223,13 +256,53 @@ h2 {
     display: grid;
     grid-template-columns: 300px 1fr;
     gap: 60px;
+    align-items: start; 
 }
 
-.about-items{
-    font-size: 30px;
+.about-items .item {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+    font-size: 25px;
+    margin-bottom: 20px; 
 }
+
+.about-items .item:nth-child(1) {
+    transition-delay: 0s;
+}
+
+.about-items .item:nth-child(2) {
+    transition-delay: 0.1s;
+}
+
+.about-items .item:nth-child(3) {
+    transition-delay: 0.2s;
+}
+
+.about-items .item:nth-child(4) {
+    transition-delay: 0.3s;
+}
+
+.about-items .item:nth-child(5) {
+    transition-delay: 0.4s;
+}
+
+.about-items .item:nth-child(6) {
+    transition-delay: 0.5s;
+}
+
+.about-items .item:nth-child(7) {
+    transition-delay: 0.6s;
+}
+
+.about-items .item.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
 .h3{
-    font-size: 30px;
+
 }
 
 .about-image {
@@ -239,6 +312,23 @@ h2 {
 
 .about-text p {
     font-size: clamp(3rem, 6vw, 5rem);
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 1.5s ease, transform 1.5s ease;
+    margin: 0;
+    line-height: 1;  /* Reduce line height */
+    margin-top: -0.13em;
+}
+
+.about-text p.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.about-text p.smaller-text {
+    font-size: 40px; /* Smaller font size */
+    line-height: 1.5; /* More readable line height */
+    margin-top: 20px; /* Add space above */
 }
 
 .technologies h3 {
@@ -267,11 +357,18 @@ h2 {
     break-inside: avoid;
     margin-bottom: 14px;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, opacity 1.5s ease;
+    opacity: 0;
+    transform: translateY(50px);
+}
+
+.gallery-item.visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .gallery-item:hover {
-    transform: scale(1.02);
+    transform: scale(1.02) translateY(0);
 }
 
 .gallery-item img {
@@ -341,8 +438,9 @@ h2 {
 }
 
 .gallery-modal-close:hover {
-    transform: rotate(90deg);
+    /*hover*/
 }
+
 
 .gallery-arrow {
     position: absolute;
@@ -400,6 +498,12 @@ h2 {
     transition: transform 0.3s ease, opacity 0.3s ease;
     opacity: 0.3;
     pointer-events: auto;
+    font-size: 25px; /*change*/
+}
+
+.project-item h3 {
+    font-weight: 400; /* Match the light weight */
+    font-size: 25px; /* Or whatever size you want */
 }
 
 .project-item.active {
@@ -416,7 +520,7 @@ h2 {
     aspect-ratio: 16 / 9;
     object-fit: cover;
     margin-bottom: 20px;
-    background: #222;
+    /*background: #222;*/
     border-radius: 4px;
 }
 
@@ -446,7 +550,7 @@ h2 {
 .modal {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.9);
+    /*background: rgba(0,0,0,0.9);*/
     display: flex;
     align-items: center;
     justify-content: center;
@@ -462,7 +566,7 @@ h2 {
 }
 
 .modal-content {
-    background: rgba(0, 0, 0, 0.75);
+    background: rgba(0, 0, 0, 1);
     border: 1px solid #333;
     max-width: 800px;
     width: 90%;
