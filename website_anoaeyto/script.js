@@ -122,13 +122,13 @@ const projectData = [
     {
         title: "PHIL KLINE'S UNSILENT NIGHT: POLYRHYTHMIC ILLUMINATION",
         image: "images/Untitled7.png",
-        description: "An immersive audiovisual installation exploring the intersection of ambient music and dynamic lighting...",
+        description: "An immersive audiovisual installation exploring the intersection of polyrhythmic music and dynamic lighting.",
         details: "Technologies: Max MSP, Arduino C++<br>Year(s): 2025<br>Exhibition(s): Unsilent Night Cambridge, Globe Studios KW"
     },
     {
         title: "Cosmic Interlude of the Nebular Web",
         image: "images/IMG_6225.JPG",
-        description: "An interactive museum experience that reimagines engagement through AR...",
+        description: "Responsive audiovisual experience exploring galaxy and star formation.",
         details: "Technologies: TouchDesigner, Adobe Creative Suite, Unity <br>Year(s): 2025<br>Exhibition(s): ALT-VERSE: THE MUSEUM EYEPOOL KW"
     },
     {
