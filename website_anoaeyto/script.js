@@ -2,7 +2,19 @@
 if ('scrollRestoration' in history) {
     history.scrollRestoration = 'manual';
 }
-window.scrollTo(0, 0);
+
+// Check if we should scroll to projects section
+if (sessionStorage.getItem('scrollToProjects') === 'true') {
+    sessionStorage.removeItem('scrollToProjects');
+    // Wait for page to load, then scroll to projects
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            document.getElementById('projects').scrollIntoView({ behavior: 'smooth' });
+        }, 100);
+    });
+} else {
+    window.scrollTo(0, 0);
+}
 
 // Enter screen functionality - ensure it's visible first
 const enterScreen = document.getElementById('enterScreen');
@@ -47,46 +59,38 @@ enterButton.addEventListener('click', () => {
     }, 1400);
 });
 
+// Projects Grid Logic
+let showingAllProjects = false;
 
-//
-
-// Projects carousel logic
-let currentProject = 0;
-const projectsContainer = document.getElementById('projectsContainer');
-const totalProjects = document.querySelectorAll('.project-item').length;
-
-function updateCarousel() {
-    const offset = -currentProject * 100;
-    projectsContainer.style.transform = `translateX(${offset}%)`;
+function toggleProjects() {
+    const projectsGrid = document.getElementById('projectsGrid');
+    const seeMoreBtn = document.getElementById('seeMoreBtn');
     
-    document.querySelectorAll('.project-item').forEach((item, index) => {
-        if (index === currentProject) {
-            item.classList.add('active');
-        } else {
-            item.classList.remove('active');
-        }
-    });
-}
-
-function handleProjectClick(index, event) {
-    if (event) event.stopPropagation();
-    if (index === currentProject) {
-        openModal(index);
+    showingAllProjects = !showingAllProjects;
+    
+    if (showingAllProjects) {
+        projectsGrid.classList.add('show-all');
+        seeMoreBtn.textContent = 'See Less';
     } else {
-        currentProject = index;
-        updateCarousel();
+        projectsGrid.classList.remove('show-all');
+        seeMoreBtn.textContent = 'See More';
+        // Scroll to projects section
+        document.getElementById('projects').scrollIntoView({ behavior: 'smooth' });
     }
 }
 
-function nextProject() {
-    currentProject = (currentProject + 1) % totalProjects;
-    updateCarousel();
+// Check if we need to show the "See More" button
+function checkProjectsCount() {
+    const projectItems = document.querySelectorAll('.project-item');
+    const seeMoreContainer = document.getElementById('seeMoreContainer');
+    
+    if (projectItems.length > 6) {
+        seeMoreContainer.style.display = 'block';
+    }
 }
 
-function prevProject() {
-    currentProject = (currentProject - 1 + totalProjects) % totalProjects;
-    updateCarousel();
-}
+// Initialize on load
+window.addEventListener('DOMContentLoaded', checkProjectsCount);
 
 const observerOptions = {
     threshold: 0.3,
@@ -117,34 +121,7 @@ galleryItems.forEach(item => {
     observer.observe(item);
 });
 
-// Data for modals
-const projectData = [
-    {
-        title: "PHIL KLINE'S UNSILENT NIGHT: POLYRHYTHMIC ILLUMINATION",
-        image: "images/Untitled7.png",
-        description: "An immersive audiovisual installation exploring the intersection of polyrhythmic music and dynamic lighting.",
-        details: "Technologies: Max MSP, Arduino C++<br>Year(s): 2025<br>Exhibition(s): Unsilent Night Cambridge, Globe Studios KW"
-    },
-    {
-        title: "Cosmic Interlude of the Nebular Web",
-        image: "images/IMG_6225.JPG",
-        description: "Responsive audiovisual experience exploring galaxy and star formation.",
-        details: "Technologies: TouchDesigner, Adobe Creative Suite, Unity <br>Year(s): 2025<br>Exhibition(s): ALT-VERSE: THE MUSEUM EYEPOOL KW"
-    },
-    {
-        title: "UNIVERSITY OF WATERLOO: TEA CLUB",
-        image: "images/sticker_5.png",
-        description: "Developed brand content, managed social media, and collaborated on website design for University of Waterloo Tea Club. See more details. ",
-        details: "Technologies: Adobe Creative Suite, Blender, Figma, & HTML/CSS <br>Year(s): 2024-2025"
-    },
-    {
-        title: "AUGMENTED REALITY EXHIBITION: DIGITAL SCULPTURES",
-        image: "images/Untitled7.png",
-        description: "A cutting-edge AR experience showcasing digital sculptures...",
-        details: "Technologies: Unity, AR Foundation<br>Year: 2024"
-    }
-];
-
+// Gallery images data
 const galleryImages = [
     { src: 'images/gallery/Untitled.png', description: 'Abstract digital composition...' },
     { src: 'images/gallery/test3.png', description: 'Experimental 3D rendering...' },
@@ -155,31 +132,6 @@ const galleryImages = [
     { src: 'images/gallery/unwritten_2.png', description: 'Typographic experimentation...' },
     { src: 'images/gallery/Untitled8.png', description: 'Surreal landscape...' }
 ];
-
-// Modal Functions
-function openModal(index) {
-    const modal = document.getElementById('projectModal');
-    const modalBody = document.getElementById('modalBody');
-    const project = projectData[index];
-    modalBody.innerHTML = `
-        <img src="${project.image}" alt="${project.title}">
-        <h2>${project.title}</h2>
-        <p>${project.description}</p><br>
-        <p>${project.details}</p>`;
-    modal.classList.add('active');
-    document.documentElement.classList.add('no-scroll');  // ← ADD THIS LINE
-}
-
-function closeModal(event) {
-    const modal = document.getElementById('projectModal');
-    if (event && (event.target.id === 'projectModal' || event.target.classList.contains('modal-close'))) {
-        modal.classList.remove('active');
-        document.documentElement.classList.remove('no-scroll');  // ← ADD THIS LINE
-    } else if (!event) {
-        modal.classList.remove('active');
-        document.documentElement.classList.remove('no-scroll');  // ← ADD THIS LINE
-    }
-}
 
 // Gallery Modal
 let currentGalleryIndex = 0;
@@ -217,6 +169,3 @@ function changeGalleryImage(dir) {
         img.classList.remove('fade-out');
     }, 300);
 }
-
-// Initialize Carousel
-updateCarousel();

@@ -23,7 +23,7 @@
     <section class="hero">
         <div class="hero-content">
             <h1>anoaeyto</h1>
-            <p>Art | Design | Game Development </p>
+            <p>Creative Technologist and Designer</p>
         </div>
     </section>
 
@@ -61,7 +61,7 @@
             </p>
 
             <p class="smaller-text">
-                My name is Matilda, I like to create and explore through telling stories. I have an undergraduate degree in Asrtophysics and am fascinated by the intersection of science, art, and technology. From game design, creative coding, arduino, to sculpting, I love to learn and document my journey.
+                My name is Matilda, I like to create and explore through telling stories. I have an undergraduate degree in Astrophysics and am fascinated by the intersection of science, art, and technology. From game design, creative coding, arduino, to sculpting, I love to learn and document my journey.
             </p>
         </div>
     </div>
@@ -101,25 +101,26 @@
     <section id="projects">
         <div class="divider"></div>
         <h2>PROJECTS</h2>
-        <div class="projects-carousel">
-            <div class="carousel-arrow left" onclick="prevProject()">‹</div>
-            <div class="carousel-arrow right" onclick="nextProject()">›</div>
-            <div class="projects-track">
-                <div class="projects-container" id="projectsContainer">
-                    <div class="project-item" onclick="handleProjectClick(0, event)">
-                        <img src="images/Untitled7.png">
-                        <h3>Phil Kline's Unsilent Night</h3>
-                    </div>
-                    <div class="project-item" onclick="handleProjectClick(1, event)">
-                        <img src="images/IMG_6226.JPG">
-                        <h3>ALT-VERSE: THE MUSEUM EYEPOOL Interactive Art</h3>
-                    </div>
-                    <div class="project-item" onclick="handleProjectClick(2, event)">
-                        <img src="images/poster.jpg">
-                        <h3>University of Waterloo Tea Club</h3>
-                    </div>
-                </div>
-            </div>
+        <div class="projects-grid" id="projectsGrid">
+            <a href="project.html?project=unsilent-night" class="project-item">
+                <img src="images/Untitled7.png">
+                <h3>Phil Kline's Unsilent Night</h3>
+            </a>
+            <a href="project.html?project=alt-verse" class="project-item">
+                <img src="images/IMG_6226.JPG">
+                <h3>ALT-VERSE: THE MUSEUM EYEPOOL Interactive Art</h3>
+            </a>
+            <a href="project.html?project=tea-club" class="project-item">
+                <img src="images/poster.jpg">
+                <h3>University of Waterloo Tea Club</h3>
+            </a>
+            <a href="project.html?project=ar-exhibition" class="project-item">
+                <img src="images/Untitled7.png">
+                <h3>Augmented Reality Exhibition</h3>
+            </a>
+        </div>
+        <div class="see-more-container" id="seeMoreContainer" style="display: none;">
+            <button class="see-more-btn" id="seeMoreBtn" onclick="toggleProjects()">See More</button>
         </div>
     </section>
 
@@ -145,7 +146,7 @@
             </a>
             <a href="https://www.instagram.com/anoaeyto/" target="_blank">
                 <svg viewBox="0 0 24 24" fill="#fff">
-                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204 013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
                 </svg>
             </a>
         </div>

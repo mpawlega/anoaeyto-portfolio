@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="projectTitle">Project - anoaeyto</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="project-style.css">
+</head>
+<body>
+
+<div class="project-hero" id="projectHero">
+    <div class="project-hero-content">
+        <h1 id="heroTitle">Project Title</h1>
+        <p id="heroSubtitle">Subtitle</p>
+    </div>
+</div>
+
+<nav class="project-nav">
+    <a href="index.html#projects" class="projects-link">Projects</a>
+    <a href="#description">Description</a>
+    <a href="#gallery">Gallery</a>
+    <a href="#process">Process</a>
+    <a href="#link" id="projectLinkNav">Project Link</a>
+</nav>
+
+<main class="project-content">
+    
+    <section id="description">
+        <h2>DESCRIPTION</h2>
+        <div class="description-content">
+            <p id="descriptionText"></p>
+            <div class="project-details" id="projectDetails"></div>
+        </div>
+    </section>
+
+    <section id="gallery">
+        <div class="divider"></div>
+        <h2>GALLERY</h2>
+        <div class="project-gallery-grid" id="projectGalleryGrid">
+            <!-- Gallery items will be inserted here -->
+        </div>
+    </section>
+
+    <section id="process">
+        <div class="divider"></div>
+        <h2>PROCESS</h2>
+        <div class="process-content" id="processContent">
+            <!-- Process content will be inserted here -->
+        </div>
+    </section>
+
+    <section id="link">
+        <div class="divider"></div>
+        <h2>PROJECT LINK</h2>
+        <div class="project-link-container">
+            <a href="#" id="externalProjectLink" target="_blank" class="external-link">
+                Visit Project
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/>
+                </svg>
+            </a>
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    <p>© 2026 anoaeyto. All rights reserved.</p>
+</footer>
+
+<!-- Gallery Modal -->
+<div class="gallery-modal" id="galleryModal" onclick="closeGalleryModal(event)">
+    <button class="gallery-modal-close" onclick="closeGalleryModal(event)">×</button>
+    <button class="gallery-arrow left" onclick="previousGalleryImage(event)">‹</button>
+    <button class="gallery-arrow right" onclick="nextGalleryImage(event)">›</button>
+    <img id="galleryModalImage" src="" alt="Gallery Image">
+</div>
+
+<script src="project-script.js"></script>
+</body>
+</html>
