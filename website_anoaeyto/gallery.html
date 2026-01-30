@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>anoaeyto's Playground</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="gallery.css">
+</head>
+<body>
+
+<div class="playground-container">
+    
+    <!-- GRID VIEW -->
+    <div class="grid-view" id="gridView">
+        <header class="playground-header">
+            <h1>anoaeyto's<br>PLAYGROUND</h1>
+            <a href="index.html" class="return-link">return to projects</a>
+        </header>
+
+        <div class="playground-grid">
+            
+            <div class="grid-item" data-category="abstractions" onclick="openGallery('abstractions')">
+                <img src="images/gallery/Untitled_3.png" alt="Abstractions">
+                <h3>abstractions</h3>
+            </div>
+
+            <div class="grid-item" data-category="environments" onclick="openGallery('environments')">
+                <img src="images/gallery/12_12_2025_10.png" alt="3D Environments">
+                <h3>environments</h3>
+            </div>
+
+            <div class="grid-item" data-category="characters" onclick="openGallery('characters')">
+                <img src="images/gallery/flame.jpg" alt="Characters">
+                <h3>characters</h3>
+            </div>
+
+            <div class="grid-item" data-category="photography" onclick="openGallery('photography')">
+                <img src="images/gallery/NCD00073.JPG" alt="Photography">
+                <h3>photography</h3>
+            </div>
+
+            <div class="grid-item" data-category="lotus" onclick="openGallery('lotus')">
+                <img src="images/gallery/NCD00645.JPG" alt="Lotus">
+                <h3>lotus</h3>
+            </div>
+
+        </div>
+
+        <footer class="playground-footer">
+            <p>© 2026 anoaeyto. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- GALLERY VIEW -->
+    <div class="gallery-view" id="galleryView" style="display: none;">
+        <div class="gallery-overlay" onclick="closeGallery()"></div>
+        <div class="gallery-container">
+            
+            <!-- Description Column (left) -->
+            <div class="gallery-description">
+                <button class="close-gallery" onclick="closeGallery()">×</button>
+                <h2 id="galleryTitle">abstractions</h2>
+                <p id="galleryDescription">Digital abstracts exploring color theory, particle systems, and minimalist compositions.</p>
+            </div>
+
+            <!-- Images Grid (right) -->
+            <div class="gallery-images" id="galleryImages">
+                <!-- Images will be populated by JavaScript -->
+            </div>
+
+        </div>
+
+        <footer class="playground-footer">
+            <p>© 2026 anoaeyto. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- Modal for full-size image view -->
+    <div class="modal" id="imageModal" onclick="closeModal()">
+        <button class="modal-close" onclick="closeModal()">×</button>
+        <button class="modal-arrow left" onclick="previousImage(event)">‹</button>
+        <button class="modal-arrow right" onclick="nextImage(event)">›</button>
+        <img id="modalImage" src="" alt="Gallery Image">
+    </div>
+
+</div>
+
+<script src="gallery.js"></script>
+</body>
+</html>

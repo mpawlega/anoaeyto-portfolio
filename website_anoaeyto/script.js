@@ -79,9 +79,29 @@ function toggleProjects() {
     }
 }
 
-// Check if we need to show the "See More" button
+// Playground Grid Logic
+let showingAllPlayground = false;
+
+function togglePlayground() {
+    const playgroundGrid = document.getElementById('playgroundGrid');
+    const seeMoreBtn = document.getElementById('playgroundSeeMoreBtn');
+    
+    showingAllPlayground = !showingAllPlayground;
+    
+    if (showingAllPlayground) {
+        playgroundGrid.classList.add('show-all');
+        seeMoreBtn.textContent = 'See Less';
+    } else {
+        playgroundGrid.classList.remove('show-all');
+        seeMoreBtn.textContent = 'See More';
+        // Scroll to playground section
+        document.getElementById('playground').scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+// Check if we need to show the "See More" buttons
 function checkProjectsCount() {
-    const projectItems = document.querySelectorAll('.project-item');
+    const projectItems = document.querySelectorAll('#projectsGrid .project-item');
     const seeMoreContainer = document.getElementById('seeMoreContainer');
     
     if (projectItems.length > 6) {
@@ -89,8 +109,20 @@ function checkProjectsCount() {
     }
 }
 
+function checkPlaygroundCount() {
+    const playgroundItems = document.querySelectorAll('#playgroundGrid .project-item');
+    const seeMoreContainer = document.getElementById('playgroundSeeMoreContainer');
+    
+    if (playgroundItems.length > 6) {
+        seeMoreContainer.style.display = 'block';
+    }
+}
+
 // Initialize on load
-window.addEventListener('DOMContentLoaded', checkProjectsCount);
+window.addEventListener('DOMContentLoaded', () => {
+    checkProjectsCount();
+    checkPlaygroundCount();
+});
 
 const observerOptions = {
     threshold: 0.3,

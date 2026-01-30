@@ -466,7 +466,7 @@ h2 {
 .project-item {
     text-align: center;
     cursor: pointer;
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    transition: opacity 0.3s ease;
     text-decoration: none;
     color: #fff;
     display: block;
@@ -481,8 +481,11 @@ h2 {
 }
 
 .project-item:hover {
+    opacity: 0.9;
+}
+
+.project-item:hover img {
     transform: scale(1.03);
-    opacity: 0.8;
 }
 
 .project-item img {
@@ -491,11 +494,48 @@ h2 {
     object-fit: cover;
     margin-bottom: 20px;
     border-radius: 4px;
+    transition: transform 0.3s ease;
+}
+
+.project-info {
+    text-align: left;
+    padding: 0 10px;
 }
 
 .project-item h3 {
     font-weight: 400;
     font-size: 25px;
+    margin-bottom: 8px;
+    line-height: 1.1;
+}
+
+.project-meta {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.project-type,
+.project-date {
+    font-size: 14px;
+    font-weight: 300;
+    /*opacity: 0.7;*/
+    letter-spacing: 0.5px;
+}
+
+.project-type::after {
+    content: "•";
+    margin-left: 12px;
+    opacity: 0.5;
+}
+
+.project-description {
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 300;
+     /*opacity: 0.7;*/
+    margin-top: 8px;
 }
 
 .see-more-container {
