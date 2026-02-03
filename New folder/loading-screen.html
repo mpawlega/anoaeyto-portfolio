@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Centered Text</title>
+    <style>
+        @font-face {
+            font-family: 'Press Start 2P';
+            src: url('PressStart2P-Regular.ttf') format('truetype');
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Eurostile', 'Eurostile Extended', monospace;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .pixel-particles {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            overflow: hidden;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .pixel {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.7);
+            opacity: 0;
+            animation: floatPixel linear infinite both;
+        }
+
+        .pixel.small { width: 2px; height: 2px; opacity: 0.9; }
+        .pixel.medium { width: 4px; height: 4px; opacity: 0.7; }
+        .pixel.large { width: 6px; height: 6px; opacity: 0.5; }
+
+        .text {
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            cursor: pointer;
+            font-size: 140px;
+            font-weight: bold;
+            color: white;
+            letter-spacing: 2px;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            position: relative;
+            z-index: 10;
+            transform: scale(1);
+            transition: transform 0.3s ease, opacity 2s ease;
+        }
+
+        .text.interactive { pointer-events: auto; }
+        .text.enlarge { transform: scale(1.08); }
+        .text.hidden { opacity: 0; pointer-events: none; }
+
+        /* Grid: size set dynamically via JS to match font */
+        .grid-overlay {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.65;
+        }
+
+        .letter {
+            opacity: 0;
+            transition: opacity 0.5s ease, font-family 0s;
+            display: inline-block;
+            will-change: transform;
+            font-family: 'Eurostile', 'Eurostile Extended', monospace;
+        }
+
+        .letter.visible { opacity: 1; }
+
+        .letter.glitch-swap {
+            font-family: 'Press Start 2P', monospace;
+            font-size: 90px;
+            text-shadow: 
+                2px 2px 0 rgba(0, 255, 0, 0.3),
+                -2px -2px 0 rgba(255, 0, 0, 0.3);
+            margin: 0 -8px;
+        }
+
+        .letter:last-child { letter-spacing: 0; }
+
+        /* "where did it go" screen */
+        #missing-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 1.5s ease;
+        }
+
+        #missing-screen.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #missing-text {
+            font-family: 'Eurostile', 'Eurostile Extended', monospace;
+            font-size: 38px;
+            color: white;
+            font-weight: bold;
+            margin-bottom: 60px;
+            text-align: center;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .missing-word {
+            display: inline-block;
+            opacity: 0;
+            transition: opacity 1.2s ease;
+        }
+
+        .missing-word.dots {
+            font-size: 80px;
+            line-height: 0.5;
+            vertical-align: middle;
+        }
+
+        .missing-word.visible {
+            opacity: 1;
+        }
+
+        #reset-square {
+            background: rgba(255, 255, 255, 0.75);
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        #reset-square:hover {
+            background: rgba(255, 255, 255, 0.95);
+            transform: scale(1.1);
+        }
+
+        #perlin-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @keyframes floatPixel {
+            0% {
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% {
+                transform: translateY(-100px) translateX(var(--drift)) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="grid-overlay" id="grid-overlay"></div>
+    <div class="pixel-particles" id="pixel-particles"></div>
+    <div class="text" id="text"></div>
+    <div id="missing-screen">
+        <div id="missing-text">
+            <span class="missing-word dots">...</span>
+            <span class="missing-word">where</span>
+            <span class="missing-word">did</span>
+            <span class="missing-word">anoaeyto</span>
+            <span class="missing-word">go?</span>
+        </div>
+        <div id="reset-square"></div>
+    </div>
+    <canvas id="perlin-canvas"></canvas>
+
+    <script>
+    // ============================================================
+    // PERLIN NOISE
+    // ============================================================
+    const perlinP = new Uint8Array(512);
+    (function seedPerlin() {
+        const p = new Uint8Array(256);
+        for (let i = 0; i < 256; i++) p[i] = i;
+        for (let i = 255; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [p[i], p[j]] = [p[j], p[i]];
+        }
+        for (let i = 0; i < 512; i++) perlinP[i] = p[i & 255];
+    })();
+
+    function fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
+    function lerp(a, b, t) { return a + t * (b - a); }
+    function grad(hash, x, y) {
+        const h = hash & 3;
+        const u = h < 2 ? x : y;
+        const v = h < 2 ? y : x;
+        return ((h & 1) ? -u : u) + ((h & 2) ? -v : v);
+    }
+
+    function perlinNoise(x, y) {
+        const X = Math.floor(x) & 255;
+        const Y = Math.floor(y) & 255;
+        x -= Math.floor(x);
+        y -= Math.floor(y);
+        const u = fade(x), v = fade(y);
+        const aa = perlinP[perlinP[X] + Y];
+        const ab = perlinP[perlinP[X] + Y + 1];
+        const ba = perlinP[perlinP[X + 1] + Y];
+        const bb = perlinP[perlinP[X + 1] + Y + 1];
+        return lerp(
+            lerp(grad(aa, x, y), grad(ba, x - 1, y), u),
+            lerp(grad(ab, x, y - 1), grad(bb, x - 1, y - 1), u),
+            v
+        );
+    }
+
+    // ============================================================
+    // GRID — aligned to page origin for consistent positioning
+    // ============================================================
+    let GRID_CELL_SIZE = 12.5; // Will be calculated based on actual letter dimensions
+    
+    // Setup and align grid
+    function alignGridToText() {
+        const textElement = document.getElementById('text');
+        const overlay = document.getElementById('grid-overlay');
+        
+        // Get the first letter 'a' to measure
+        const firstLetter = letters[0];
+        const letterRect = firstLetter.getBoundingClientRect();
+        
+        // Calculate grid size so letter fits perfectly in a square
+        // Use the larger dimension to ensure letter fits in a circle within the square
+        const letterWidth = letterRect.width;
+        const letterHeight = letterRect.height;
+        const letterSize = Math.max(letterWidth, letterHeight);
+        
+        // Grid cell is letter size divided by 8 (for 8 subdivisions)
+        GRID_CELL_SIZE = letterSize / 8;
+        
+        console.log('=== GRID SETUP ===');
+        console.log('Letter "a" dimensions:', letterWidth, 'x', letterHeight);
+        console.log('Letter size (max):', letterSize);
+        console.log('Grid cell size (letter / 8):', GRID_CELL_SIZE);
+        console.log('Grid covers entire page starting at (0, 0)');
+        console.log('Grid cells horizontally:', Math.ceil(window.innerWidth / GRID_CELL_SIZE));
+        console.log('Grid cells vertically:', Math.ceil(window.innerHeight / GRID_CELL_SIZE));
+        console.log('==================');
+        
+        // Setup grid with calculated size, aligned to page origin (0,0)
+        overlay.style.backgroundImage =
+            `linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+             linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)`;
+        overlay.style.backgroundSize = `${GRID_CELL_SIZE}px ${GRID_CELL_SIZE}px`;
+        overlay.style.backgroundPosition = '0 0';
+    }
+
+    // ============================================================
+    // MAIN
+    // ============================================================
+    const textElement = document.getElementById('text');
+    const word = 'anoaeyto';
+    const letters = [];
+    let physicsActive = false;
+    let glitchInterval = null;
+    let disappearTimeout = null;
+    let revealDone = false;
+
+    const letterState = [];
+    const spiralConfigs = [];
+
+    // --- Pixel particles ---
+    (function createPixelParticles() {
+        const container = document.getElementById('pixel-particles');
+        for (let i = 0; i < 25; i++) {
+            const pixel = document.createElement('div');
+            pixel.className = 'pixel';
+            pixel.classList.add(['small','medium','large'][Math.floor(Math.random() * 3)]);
+            pixel.style.left = Math.random() * 100 + '%';
+            pixel.style.animationDuration = (12 + Math.random() * 18) + 's';
+            pixel.style.animationDelay = (1 + Math.random() * 8) + 's';
+            pixel.style.setProperty('--drift', ((Math.random() - 0.5) * 150) + 'px');
+            container.appendChild(pixel);
+        }
+    })();
+
+    // --- Letters ---
+    function createLetters() {
+        textElement.innerHTML = '';
+        letters.length = 0;
+        letterState.length = 0;
+        word.split('').forEach((char) => {
+            const span = document.createElement('span');
+            span.className = 'letter';
+            span.textContent = char;
+            textElement.appendChild(span);
+            letters.push(span);
+            letterState.push({ t: 0, x: 0, y: 0, rot: 0, returning: false });
+        });
+    }
+    createLetters();
+
+    // Lock width
+    letters.forEach(l => l.style.opacity = '1');
+    textElement.offsetWidth;
+    textElement.style.width = textElement.getBoundingClientRect().width + 'px';
+    textElement.style.justifyContent = 'center';
+    letters.forEach(l => l.style.opacity = '');
+    
+    // Setup grid immediately based on letter dimensions
+    alignGridToText();
+    
+    // Set reset square size to match grid
+    const resetSquare = document.getElementById('reset-square');
+    resetSquare.style.width = `${GRID_CELL_SIZE}px`;
+    resetSquare.style.height = `${GRID_CELL_SIZE}px`;
+
+    // --- Golden spiral ---
+    const PHI = 1.6180339887;
+    const GOLDEN_B = Math.log(PHI) / (Math.PI / 2);
+
+    function getSpiralPos(cfg, t) {
+        const theta = cfg.startAngle + cfg.direction * cfg.totalAngle * t;
+        const rStart = cfg.scale * Math.exp(GOLDEN_B * cfg.startAngle);
+        const r = cfg.scale * Math.exp(GOLDEN_B * theta) - rStart;
+        return {
+            x: r * Math.cos(theta),
+            y: r * Math.sin(theta),
+            rot: cfg.direction * cfg.totalAngle * t * (180 / Math.PI) * 0.5
+        };
+    }
+
+    function generateSpiralConfigs() {
+        spiralConfigs.length = 0;
+        const count = letters.length;
+        for (let i = 0; i < count; i++) {
+            spiralConfigs.push({
+                startAngle: (i / count) * Math.PI * 2,
+                direction: (i % 2 === 0) ? 1 : -1,
+                scale: 40 + i * 18 + Math.random() * 15,
+                totalAngle: Math.PI * (2.5 + Math.random() * 1.5)
+            });
+        }
+    }
+
+    // --- Reveal ---
+    let revealIndex = 0;
+    function revealNext() {
+        if (revealIndex < letters.length) {
+            letters[revealIndex].classList.add('visible');
+            revealIndex++;
+            setTimeout(revealNext, 750);
+        } else {
+            textElement.classList.add('interactive');
+            startGlitchEffects();
+            generateSpiralConfigs();
+            revealDone = true;
+            // 10s then start smooth drift
+            setTimeout(() => { 
+                physicsActive = true;
+                startSmoothDrift();
+            }, 100);
+            // 10s then disappear (faster for debugging)
+            disappearTimeout = setTimeout(triggerDisappear, 10000);
+        }
+    }
+    setTimeout(revealNext, 1000);
+
+    // --- Smooth initial drift start ---
+    function startSmoothDrift() {
+        // Stagger the start time for each letter for smooth wave effect
+        letters.forEach((letter, idx) => {
+            const s = letterState[idx];
+            const delay = idx * 150; // 150ms delay between each letter starting
+            setTimeout(() => {
+                s.drifting = true;
+            }, delay);
+        });
+    }
+
+    // --- Smooth initial drift start ---
+    function startSmoothDrift() {
+        // Stagger the start time for each letter for smooth wave effect
+        letters.forEach((letter, idx) => {
+            const s = letterState[idx];
+            const delay = idx * 150; // 150ms delay between each letter starting
+            setTimeout(() => {
+                s.drifting = true;
+            }, delay);
+        });
+    }
+
+    // --- Disappear → show three dots only ---
+    function triggerDisappear() {
+        physicsActive = false;
+        textElement.classList.add('hidden');
+        
+        // After text fades out, show 3 white grid squares
+        setTimeout(() => {
+            showCenterGridSquares();
+            // Dots stay visible - no more transitions
+        }, 2200);
+    }
+    
+    // Get grid background position offset (now always 0,0)
+    function getGridOffset() {
+        return { x: 0, y: 0 };
+    }
+    
+    // Snap position to grid (much simpler now)
+    function snapToGrid(x, y) {
+        const snappedX = Math.round(x / GRID_CELL_SIZE) * GRID_CELL_SIZE;
+        const snappedY = Math.round(y / GRID_CELL_SIZE) * GRID_CELL_SIZE;
+        return { x: snappedX, y: snappedY };
+    }
+    
+    // Dot 1 - exactly like resetSquareDiv
+    const dot1Div = document.createElement('div');
+    dot1Div.id = 'dot-1';
+    dot1Div.style.cssText = `
+        position: fixed;
+        background: white;
+        opacity: 0;
+        transition: opacity 0.8s ease;
+        z-index: 20;
+    `;
+    document.body.appendChild(dot1Div);
+    
+    // Dot 2 - exactly like resetSquareDiv
+    const dot2Div = document.createElement('div');
+    dot2Div.id = 'dot-2';
+    dot2Div.style.cssText = `
+        position: fixed;
+        background: white;
+        opacity: 0;
+        transition: opacity 0.8s ease;
+        z-index: 20;
+    `;
+    document.body.appendChild(dot2Div);
+    
+    // Dot 3 - exactly like resetSquareDiv
+    const dot3Div = document.createElement('div');
+    dot3Div.id = 'dot-3';
+    dot3Div.style.cssText = `
+        position: fixed;
+        background: white;
+        opacity: 0;
+        transition: opacity 0.8s ease;
+        z-index: 20;
+    `;
+    document.body.appendChild(dot3Div);
+    
+    function showCenterGridSquares() {
+        console.log('showCenterGridSquares called! GRID_CELL_SIZE =', GRID_CELL_SIZE);
+        
+        // Find the grid cell that contains the page center
+        const pageCenterX = window.innerWidth / 2;
+        const pageCenterY = window.innerHeight / 2;
+        
+        // Find which grid cell contains the page center
+        const centerCol = Math.floor(pageCenterX / GRID_CELL_SIZE);
+        const centerRow = Math.floor(pageCenterY / GRID_CELL_SIZE);
+        
+        console.log('Page center:', pageCenterX, pageCenterY);
+        console.log('Center grid cell: col', centerCol, 'row', centerRow);
+        
+        // Dot 1 - 2 cells to the left of center
+        const col1 = centerCol - 2;
+        const row1 = centerRow;
+        const grid1X = col1 * GRID_CELL_SIZE;
+        const grid1Y = row1 * GRID_CELL_SIZE;
+        
+        dot1Div.style.width = `${GRID_CELL_SIZE}px`;
+        dot1Div.style.height = `${GRID_CELL_SIZE}px`;
+        dot1Div.style.left = `${grid1X}px`;
+        dot1Div.style.top = `${grid1Y}px`;
+        
+        console.log('Dot 1 at col', col1, 'row', row1, '=', grid1X, grid1Y);
+        
+        // Dot 2 - at center
+        const col2 = centerCol;
+        const row2 = centerRow;
+        const grid2X = col2 * GRID_CELL_SIZE;
+        const grid2Y = row2 * GRID_CELL_SIZE;
+        
+        dot2Div.style.width = `${GRID_CELL_SIZE}px`;
+        dot2Div.style.height = `${GRID_CELL_SIZE}px`;
+        dot2Div.style.left = `${grid2X}px`;
+        dot2Div.style.top = `${grid2Y}px`;
+        
+        console.log('Dot 2 at col', col2, 'row', row2, '=', grid2X, grid2Y);
+        
+        // Dot 3 - 2 cells to the right of center
+        const col3 = centerCol + 2;
+        const row3 = centerRow;
+        const grid3X = col3 * GRID_CELL_SIZE;
+        const grid3Y = row3 * GRID_CELL_SIZE;
+        
+        dot3Div.style.width = `${GRID_CELL_SIZE}px`;
+        dot3Div.style.height = `${GRID_CELL_SIZE}px`;
+        dot3Div.style.left = `${grid3X}px`;
+        dot3Div.style.top = `${grid3Y}px`;
+        
+        console.log('Dot 3 at col', col3, 'row', row3, '=', grid3X, grid3Y);
+        
+        // Show dots one by one
+        setTimeout(() => { 
+            console.log('Setting dot1 opacity to 1');
+            dot1Div.style.opacity = '1'; 
+        }, 100);
+        setTimeout(() => { 
+            console.log('Setting dot2 opacity to 1');
+            dot2Div.style.opacity = '1'; 
+        }, 600);
+        setTimeout(() => { 
+            console.log('Setting dot3 opacity to 1');
+            dot3Div.style.opacity = '1'; 
+        }, 1100);
+    }
+    
+    function hideCenterGridSquares() {
+        dot1Div.style.opacity = '0';
+        dot2Div.style.opacity = '0';
+        dot3Div.style.opacity = '0';
+    }
+    
+    // Pulsing pixels container
+    const pulsingPixelsDiv = document.createElement('div');
+    pulsingPixelsDiv.id = 'pulsing-pixels';
+    pulsingPixelsDiv.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 25;
+    `;
+    document.body.appendChild(pulsingPixelsDiv);
+    
+    // Reset square that appears after text vanishes
+    const resetSquareDiv = document.createElement('div');
+    resetSquareDiv.id = 'reset-square-grid';
+    resetSquareDiv.style.cssText = `
+        position: fixed;
+        background: white;
+        cursor: pointer;
+        opacity: 0.5;
+        transition: opacity 0.8s ease, background 0.2s ease;
+        z-index: 20;
+    `;
+    resetSquareDiv.addEventListener('mouseenter', () => {
+        resetSquareDiv.style.opacity = '1';
+    });
+    resetSquareDiv.addEventListener('mouseleave', () => {
+        resetSquareDiv.style.opacity = '0.5';
+    });
+    document.body.appendChild(resetSquareDiv);
+    
+    let pulseInterval = null;
+    
+    function showResetSquare() {
+        // Select a random grid cell for the pulsing square
+        const totalCols = Math.floor(window.innerWidth / GRID_CELL_SIZE);
+        const totalRows = Math.floor(window.innerHeight / GRID_CELL_SIZE);
+        
+        const randomCol = Math.floor(Math.random() * totalCols);
+        const randomRow = Math.floor(Math.random() * totalRows);
+        
+        const gridX = randomCol * GRID_CELL_SIZE;
+        const gridY = randomRow * GRID_CELL_SIZE;
+        
+        console.log('=== RANDOM PULSING SQUARE ===');
+        console.log('Random grid cell [col, row]:', randomCol, randomRow);
+        console.log('Position:', gridX, gridY);
+        console.log('==================');
+        
+        resetSquareDiv.style.width = `${GRID_CELL_SIZE}px`;
+        resetSquareDiv.style.height = `${GRID_CELL_SIZE}px`;
+        resetSquareDiv.style.left = `${gridX}px`;
+        resetSquareDiv.style.top = `${gridY}px`;
+        resetSquareDiv.style.opacity = '0.5';
+        
+        // Hide center squares
+        centerSquaresDiv.style.opacity = '0';
+        
+        // Start pulsing pixels from inner subdivision
+        startPulsingPixels(gridX, gridY);
+    }
+    
+    function startPulsingPixels(squareX, squareY) {
+        pulsingPixelsDiv.innerHTML = '';
+        
+        // Calculate inner subdivision area (smaller than the grid cell)
+        const innerSize = GRID_CELL_SIZE / 2; // One subdivision smaller
+        const innerOffset = (GRID_CELL_SIZE - innerSize) / 2;
+        const innerX = squareX + innerOffset;
+        const innerY = squareY + innerOffset;
+        
+        // Create pulsing pixels that shoot out from inner area
+        pulseInterval = setInterval(() => {
+            const pixel = document.createElement('div');
+            const angle = Math.random() * Math.PI * 2;
+            const distance = 30 + Math.random() * 40;
+            const size = 2 + Math.random() * 4;
+            
+            // Start from random position within inner subdivision
+            const startX = innerX + Math.random() * innerSize;
+            const startY = innerY + Math.random() * innerSize;
+            
+            pixel.style.cssText = `
+                position: absolute;
+                width: ${size}px;
+                height: ${size}px;
+                background: white;
+                left: ${startX}px;
+                top: ${startY}px;
+                opacity: 1;
+                pointer-events: none;
+            `;
+            
+            pulsingPixelsDiv.appendChild(pixel);
+            
+            // Animate outward
+            pixel.animate([
+                { transform: 'translate(0, 0)', opacity: 1 },
+                { transform: `translate(${Math.cos(angle) * distance}px, ${Math.sin(angle) * distance}px)`, opacity: 0 }
+            ], {
+                duration: 800 + Math.random() * 400,
+                easing: 'ease-out'
+            }).onfinish = () => pixel.remove();
+            
+        }, 100);
+    }
+    
+    function stopPulsingPixels() {
+        if (pulseInterval) {
+            clearInterval(pulseInterval);
+            pulseInterval = null;
+        }
+        pulsingPixelsDiv.innerHTML = '';
+    }
+
+    // --- Reset: bring anoaeyto back ---
+    resetSquareDiv.addEventListener('click', () => {
+        // Simple reset - no Perlin animation
+        resetAfterPerlin();
+    });
+    
+    document.getElementById('reset-square').addEventListener('click', () => {
+        resetAfterPerlin();
+    });
+    
+    function resetAfterPerlin() {
+        // Stop pulsing pixels
+        stopPulsingPixels();
+        
+        // Hide missing screen and reset word visibility
+        const missingScreen = document.getElementById('missing-screen');
+        missingScreen.classList.remove('visible');
+        missingScreen.style.display = 'flex';
+        const words = missingScreen.querySelectorAll('.missing-word');
+        words.forEach(w => w.classList.remove('visible'));
+        
+        // Hide center squares and reset square
+        hideCenterGridSquares();
+        resetSquareDiv.style.opacity = '0';
+
+        // Reset text
+        textElement.classList.remove('hidden');
+        textElement.classList.remove('enlarge');
+        textElement.classList.remove('interactive');
+
+        // Reset letter states
+        letterState.forEach(s => { 
+            s.t = 0; 
+            s.x = 0; 
+            s.y = 0; 
+            s.rot = 0; 
+            s.returning = false;
+            s.drifting = false;
+        });
+        letters.forEach(l => { 
+            l.classList.remove('visible'); 
+            l.style.transform = 'translate(0px, 0px) rotate(0deg)'; 
+        });
+
+        physicsActive = false;
+        revealDone = false;
+        revealIndex = 0;
+
+        // Stop old glitch
+        if (glitchInterval) { clearInterval(glitchInterval); glitchInterval = null; }
+
+        // Re-reveal after short pause
+        setTimeout(() => {
+            revealNext();
+        }, 800);
+    }
+
+    // --- Physics ---
+    const DRIFT_SPEED  = 0.0001; // Balanced drift speed
+    const ATTRACT_RADIUS = 350;
+    const RETURN_LERP  = 0.025;
+
+    let mouse = { x: -9999, y: -9999 };
+    let hoverHomeTimer = 0;
+
+    document.addEventListener('mousemove', (e) => {
+        mouse.x = e.clientX;
+        mouse.y = e.clientY;
+    });
+
+    function updateLetterPhysics() {
+        // Enlarge runs always once reveal is done
+        if (revealDone) {
+            const textRect = textElement.getBoundingClientRect();
+            const textCx = textRect.left + textRect.width / 2;
+            const textCy = textRect.top + textRect.height / 2;
+            const mouseDist = Math.sqrt((mouse.x - textCx) ** 2 + (mouse.y - textCy) ** 2);
+            const mouseIsNear = mouseDist < ATTRACT_RADIUS;
+            const allHome = letterState.every(s => Math.abs(s.x) < 1 && Math.abs(s.y) < 1);
+
+            if (mouseIsNear && allHome) {
+                hoverHomeTimer += 16;
+                if (hoverHomeTimer > 300) { // Faster trigger (was 800ms, now 300ms)
+                    textElement.classList.add('enlarge');
+                }
+            } else {
+                if (!mouseIsNear) {
+                    hoverHomeTimer = 0;
+                    textElement.classList.remove('enlarge');
+                }
+            }
+        }
+
+        if (!physicsActive) {
+            requestAnimationFrame(updateLetterPhysics);
+            return;
+        }
+
+        const textRect = textElement.getBoundingClientRect();
+        const textCx = textRect.left + textRect.width / 2;
+        const textCy = textRect.top + textRect.height / 2;
+        const mouseDist = Math.sqrt((mouse.x - textCx) ** 2 + (mouse.y - textCy) ** 2);
+        const mouseIsNear = mouseDist < ATTRACT_RADIUS;
+
+        letters.forEach((letter, idx) => {
+            const s = letterState[idx];
+            const cfg = spiralConfigs[idx];
+
+            if (mouseIsNear) {
+                s.returning = true;
+                s.drifting = false;
+                s.x += (0 - s.x) * RETURN_LERP;
+                s.y += (0 - s.y) * RETURN_LERP;
+                s.rot += (0 - s.rot) * RETURN_LERP;
+
+                if (Math.abs(s.x) < 0.5 && Math.abs(s.y) < 0.5) {
+                    s.x = 0; s.y = 0; s.rot = 0;
+                    s.t = 0;
+                    s.returning = false;
+                }
+            } else {
+                s.returning = false;
+
+                // Only drift if this letter has started drifting
+                if (s.drifting) {
+                    // Smooth helical drift with natural acceleration
+                    const targetT = Math.min(s.t + DRIFT_SPEED * 60, 1);
+                    s.t += (targetT - s.t) * 0.04; // Smooth progression
+
+                    const pos = getSpiralPos(cfg, s.t);
+
+                    // Smooth helical interpolation
+                    const lerpFactor = 0.05; // Balanced for smooth flow
+                    s.x += (pos.x - s.x) * lerpFactor;
+                    s.y += (pos.y - s.y) * lerpFactor;
+                    s.rot += (pos.rot - s.rot) * lerpFactor;
+                }
+            }
+
+            // Collision avoidance — only while drifting out
+            if (!s.returning && s.drifting) {
+                for (let j = 0; j < letters.length; j++) {
+                    if (j === idx) continue;
+                    const other = letterState[j];
+                    if (!other.drifting) continue; // Only avoid other drifting letters
+                    
+                    const dx = s.x - other.x;
+                    const dy = s.y - other.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if (dist < 90 && dist > 0) {
+                        const push = (90 - dist) / 90 * 0.003;
+                        s.t = Math.min(s.t + push, 1);
+                        const pos = getSpiralPos(cfg, s.t);
+                        s.x += (pos.x - s.x) * 0.05;
+                        s.y += (pos.y - s.y) * 0.05;
+                        s.rot += (pos.rot - s.rot) * 0.05;
+                    }
+                }
+            }
+
+            letter.style.transform = `translate(${s.x}px, ${s.y}px) rotate(${s.rot}deg)`;
+        });
+
+        requestAnimationFrame(updateLetterPhysics);
+    }
+    requestAnimationFrame(updateLetterPhysics);
+
+    // --- Glitch ---
+    function glitchLetter(letter) {
+        letter.classList.add('glitch-swap');
+        setTimeout(() => letter.classList.remove('glitch-swap'), 80 + Math.random() * 120);
+    }
+
+    function startGlitchEffects() {
+        if (glitchInterval) clearInterval(glitchInterval);
+        glitchInterval = setInterval(() => {
+            const count = 1 + Math.floor(Math.random() * 3);
+            const indices = letters.map((_, i) => i).sort(() => Math.random() - 0.5);
+            for (let j = 0; j < count; j++) {
+                setTimeout(() => glitchLetter(letters[indices[j]]), j * (30 + Math.random() * 50));
+            }
+        }, 1500 + Math.random() * 1500);
+    }
+
+    // ============================================================
+    // PERLIN NOISE TRANSITION - outward from clicked square
+    // ============================================================
+    const canvas = document.getElementById('perlin-canvas');
+    const ctx = canvas.getContext('2d');
+    let perlinAnimating = false;
+    let perlinStart = 0;
+    const PERLIN_DURATION = 2200;
+    let gridSquares = [];
+
+    function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+
+    function startPerlinOutward(clickedSquare) {
+        if (perlinAnimating) return;
+        perlinAnimating = true;
+        
+        // Hide grid during transition
+        document.getElementById('grid-overlay').style.opacity = '0';
+        
+        // Get center point of clicked square
+        const rect = clickedSquare.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        
+        generatePerlinSquares(centerX, centerY);
+        perlinStart = 0;
+        requestAnimationFrame(animatePerlinOutward);
+    }
+
+    function generatePerlinSquares(centerX, centerY) {
+        gridSquares = [];
+        
+        // Use grid cell size with new grid starting at 0,0
+        const squareSize = GRID_CELL_SIZE;
+        const cols = Math.ceil(canvas.width / squareSize);
+        const rows = Math.ceil(canvas.height / squareSize);
+        
+        // Create array of all grid squares with distance from center
+        for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
+                // Grid starts at 0,0 - simple alignment
+                const x = col * squareSize;
+                const y = row * squareSize;
+                
+                // Calculate distance from center
+                const squareCenterX = x + squareSize / 2;
+                const squareCenterY = y + squareSize / 2;
+                const distance = Math.sqrt(
+                    Math.pow(squareCenterX - centerX, 2) + 
+                    Math.pow(squareCenterY - centerY, 2)
+                );
+                
+                // Normalize distance and add Perlin noise for randomization
+                const maxDistance = Math.sqrt(
+                    Math.pow(canvas.width, 2) + Math.pow(canvas.height, 2)
+                );
+                const normalizedDist = distance / maxDistance;
+                
+                // Add multiple layers of Perlin noise for more variation
+                const nx1 = col * 0.08 + Math.random() * 0.5;
+                const ny1 = row * 0.08 + Math.random() * 0.5;
+                const noise1 = (perlinNoise(nx1, ny1) + 1) / 2;
+                
+                const nx2 = col * 0.2 + 10;
+                const ny2 = row * 0.2 + 10;
+                const noise2 = (perlinNoise(nx2, ny2) + 1) / 2;
+                
+                // Combine distance with multiple noise layers
+                const threshold = normalizedDist * 0.5 + noise1 * 0.3 + noise2 * 0.2;
+                
+                // Randomly assign pure white or pure black - no grey
+                const isWhite = Math.random() > 0.5;
+                
+                gridSquares.push({
+                    x, y,
+                    size: squareSize,
+                    threshold,
+                    isWhite: isWhite
+                });
+            }
+        }
+    }
+
+    function animatePerlinOutward(timestamp) {
+        if (!perlinStart) perlinStart = timestamp;
+        const elapsed = timestamp - perlinStart;
+        const totalDuration = PERLIN_DURATION * 2; // Mix then all black
+        const progress = Math.min(elapsed / totalDuration, 1);
+        
+        let phase;
+        let phaseProgress;
+        
+        if (progress < 0.5) {
+            // Phase 1: Show white and black mix
+            phase = 'mix';
+            phaseProgress = progress * 2; // 0 to 1
+        } else {
+            // Phase 2: Everything to black
+            phase = 'toBlack';
+            phaseProgress = (progress - 0.5) * 2; // 0 to 1
+        }
+
+        canvas.style.opacity = '1';
+        drawPerlinOutward(phaseProgress, phase);
+
+        if (progress < 1) {
+            requestAnimationFrame(animatePerlinOutward);
+        } else {
+            canvas.style.opacity = '0';
+            perlinAnimating = false;
+            // Restore grid
+            document.getElementById('grid-overlay').style.opacity = '0.65';
+            setTimeout(() => {
+                resetAfterPerlin();
+            }, 150);
+        }
+    }
+
+    function drawPerlinOutward(progress, phase) {
+        const w = canvas.width;
+        const h = canvas.height;
+        
+        // Always start with black
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, w, h);
+
+        gridSquares.forEach((square) => {
+            const visible = progress > square.threshold;
+            
+            if (visible) {
+                const bw = Math.min(square.size, w - square.x);
+                const bh = Math.min(square.size, h - square.y);
+                
+                if (phase === 'mix') {
+                    // Show white squares during mix phase
+                    if (square.isWhite) {
+                        ctx.fillStyle = 'white';
+                        ctx.fillRect(square.x, square.y, bw, bh);
+                    }
+                    // Black squares stay black (already filled with black background)
+                } else if (phase === 'toBlack') {
+                    // Fade white squares to black
+                    if (square.isWhite) {
+                        const fadeProgress = progress;
+                        // Fade from white to black
+                        const grayValue = Math.floor(255 * (1 - fadeProgress));
+                        ctx.fillStyle = `rgb(${grayValue}, ${grayValue}, ${grayValue})`;
+                        ctx.fillRect(square.x, square.y, bw, bh);
+                    }
+                }
+            }
+        });
+    }
+
+    // Text click removed - focusing on dots only
+    </script>
+</body>
+</html>

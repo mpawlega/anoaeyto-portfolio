@@ -1,0 +1,1816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>anoaeyto - Portfolio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+        
+        body {
+            background-color: #000;
+            color: #d4d4d4;
+            font-family: 'Eurostile', 'Eurostile Extended', monospace;
+            overflow-x: hidden;
+            opacity: 0;
+            animation: pageLoadFadeIn 0.8s ease-in-out forwards;
+            position: relative;
+        }
+
+        /* Film grain overlay - DISABLED */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PGZlQ29sb3JNYXRyaXggdHlwZT0ic2F0dXJhdGUiIHZhbHVlcz0iMCIvPjwvZmlsdGVyPjxwYXRoIGQ9Ik0wIDBoMzAwdjMwMEgweiIgZmlsdGVyPSJ1cmwoI2EpIiBvcGFjaXR5PSIuMDUiLz48L3N2Zz4=');
+            opacity: 0;
+            z-index: 9999;
+            pointer-events: none;
+            animation: grainMove 0.5s steps(6) infinite;
+        }
+
+        /* Scanlines - REMOVED for cleaner appearance */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                rgba(0, 0, 0, 0.15),
+                rgba(0, 0, 0, 0.15) 1px,
+                transparent 1px,
+                transparent 2px
+            );
+            z-index: 9998;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        /* Technical grid overlay */
+        .tech-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.08;
+        }
+
+        /* Pixelation overlay for transitions */
+        .pixelation-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 125vh;
+            height: 125vh;
+            pointer-events: none;
+            z-index: 10000;
+            opacity: 0;
+        }
+
+        .pixelation-overlay.active {
+            opacity: 1;
+        }
+
+        /* Version number HUD element */
+        .version-hud {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 11px;
+            letter-spacing: 1px;
+            color: #00b8a8;
+            z-index: 9997;
+            text-align: right;
+            line-height: 1.6;
+        }
+
+        /* Coordinates HUD element */
+        .coords-hud {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            font-size: 11px;
+            letter-spacing: 1px;
+            color: #00b8a8;
+            z-index: 9997;
+        }
+
+        /* Corner brackets */
+        .corner-brackets {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9996;
+        }
+
+        .corner-bracket {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .corner-bracket.top-left {
+            top: 10px;
+            left: 10px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .corner-bracket.top-right {
+            top: 10px;
+            right: 10px;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .corner-bracket.bottom-left {
+            bottom: 10px;
+            left: 10px;
+            border-right: none;
+            border-top: none;
+        }
+
+        .corner-bracket.bottom-right {
+            bottom: 10px;
+            right: 10px;
+            border-left: none;
+            border-top: none;
+        }
+        
+        /* Hero Section */
+        .hero {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Pixel particles */
+        .pixel-particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .pixel {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.3);
+            animation: floatPixel linear infinite;
+        }
+
+        .pixel.small {
+            width: 2px;
+            height: 2px;
+            opacity: 0.4;
+        }
+
+        .pixel.medium {
+            width: 6px;
+            height: 6px;
+            opacity: 0.2;
+        }
+
+        .pixel.large {
+            width: 8px;
+            height: 8px;
+            opacity: 0.15;
+        }
+
+        /* Geometric accent lines */
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1) 50%, transparent);
+            z-index: 1;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 1px;
+            height: 100%;
+            background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.05) 50%, transparent);
+            z-index: 1;
+        }
+        
+        #background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 0;
+            opacity: 1;
+        }
+        
+        .hero-text {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+        
+        .hero-text h1 {
+            font-size: 140px;
+            font-weight: 100;
+            letter-spacing: 8px;
+            -webkit-font-smoothing: antialiased;
+            mix-blend-mode: screen;
+            text-transform: lowercase;
+            opacity: 0;
+            animation: titleFadeIn 0.8s ease-in-out forwards;
+            animation-delay: 0.3s;
+            position: relative;
+            text-shadow: 
+                2px 2px 0 rgba(255, 0, 0, 0.05),
+                -2px -2px 0 rgba(0, 255, 255, 0.05);
+            color: #ffffff;
+        }
+
+        .hero-text h1:hover {
+            /* Hover removed */
+        }
+
+        .hero-text h1::before {
+            display: none;
+        }
+
+        .hero-image-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 1000px;
+            height: 1000px;
+            overflow: hidden;
+            z-index: -1;
+            pointer-events: none;
+            opacity: ;
+            animation: imageAppear 3.3s ease-in-out forwards;
+            animation-delay: 1.2s;
+        }
+
+        .hero-image-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            opacity: 0.9;
+            mix-blend-mode: screen;
+        }
+        
+        .hero-text p {
+            font-size: 13px;
+            font-weight: normal;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: subtitleFadeIn 0.8s ease-in-out forwards;
+            animation-delay: 0.9s;
+            margin-top: 30px;
+            color: #d4d4d4;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            opacity: 0;
+            animation: scrollIndicatorFade 0.8s ease-in-out forwards;
+            animation-delay: 1.5s;
+        }
+
+        .scroll-indicator span {
+            display: block;
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #888;
+            margin-bottom: 15px;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 60px;
+            background: linear-gradient(to bottom, #888, transparent);
+            margin: 0 auto;
+            animation: scrollLineMove 2s ease-in-out infinite;
+        }
+
+        /* Nav */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            padding: 25px 0;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            opacity: 0;
+            animation: navFadeIn 0.6s ease-in-out forwards;
+            animation-delay: 1.8s;
+        }
+
+        .nav::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        }
+
+        .nav a {
+            color: #888;
+            text-decoration: none;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+            position: relative;
+            padding: 4px 8px;
+            border: 1px solid transparent;
+        }
+
+        .nav a::before {
+            content: '[';
+            margin-right: 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav a::after {
+            content: ']';
+            margin-left: 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav a:hover {
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .nav a:hover::before,
+        .nav a:hover::after {
+            opacity: 1;
+        }
+        
+        /* About Section */
+        .about {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            background-color: #000;
+            overflow: hidden;
+            position: relative;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .about.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .about::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.15), transparent);
+        }
+
+        .about::after {
+            content: 'SECTION_01';
+            position: absolute;
+            top: 20px;
+            right: 80px;
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: #333;
+        }
+        
+        /* Image wrapper — fixed effect that completes on first scroll into view */
+        .about-image-wrapper {
+            width: 25%;
+            height: 60vh;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0;
+            align-self: center;
+            margin-left: 60px;
+        }
+
+        /* The actual photo — always rendered, canvas covers it */
+        .about-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 30%;
+            display: block;
+            filter: saturate(1.2) brightness(0.8);
+            transition: filter 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.4s;
+            /* Apply screen blend mode like anoaeyto text */
+            mix-blend-mode: screen;
+            text-shadow: 
+                2px 2px 0 rgba(255, 0, 0, 0.05),
+                -2px -2px 0 rgba(0, 255, 255, 0.05);
+        }
+
+        .about.visible .about-image-wrapper img {
+            filter: saturate(1.3) brightness(0.9);
+        }
+
+        /* Pixel glitch blocks at bottom for aesthetic - jagged cutoff */
+        .about-image-wrapper::after {
+            display: none;
+        }
+
+        .about.visible .about-image-wrapper img {
+            filter: saturate(1.3) brightness(0.9);
+        }
+        .about-image-wrapper canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        
+        .about-text {
+            width: 75%;
+            padding: 60px 80px;
+        }
+        
+        .about-text h2 {
+            font-size: 64px;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+            font-weight: 100;
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+            transition-delay: 0.85s;
+            color: #ffffff;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .about-text h2::before {
+            content: '//';
+            position: absolute;
+            left: 0;
+            color: #666;
+            font-size: 56px;
+        }
+
+        .about.visible .about-text h2 {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .about-intro {
+            font-size: 24px;
+            line-height: 1.8;
+            color: #d4d4d4;
+            margin-bottom: 40px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+            transition-delay: 0.95s;
+            font-weight: 100;
+        }
+
+        .about.visible .about-intro {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .about-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 24px;
+            margin-bottom: 50px;
+        }
+
+        .about-skills span {
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #888;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), color 0.3s ease, border-color 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 14px;
+            background: rgba(255, 255, 255, 0.02);
+            position: relative;
+        }
+
+        .about-skills span::before {
+            content: '>';
+            margin-right: 6px;
+            color: #666;
+        }
+
+        .about-skills span:hover {
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .about.visible .about-skills span {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .about.visible .about-skills span:nth-child(1) { transition-delay: 1s; }
+        .about.visible .about-skills span:nth-child(2) { transition-delay: 1.08s; }
+        .about.visible .about-skills span:nth-child(3) { transition-delay: 1.16s; }
+        .about.visible .about-skills span:nth-child(4) { transition-delay: 1.24s; }
+        .about.visible .about-skills span:nth-child(5) { transition-delay: 1.32s; }
+        .about.visible .about-skills span:nth-child(6) { transition-delay: 1.4s; }
+        .about.visible .about-skills span:nth-child(7) { transition-delay: 1.48s; }
+        
+        .about-text p {
+            font-size: 17px;
+            line-height: 2;
+            color: #999;
+            margin-bottom: 20px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .about-text p:nth-of-type(1) { transition-delay: 1.6s; }
+        .about-text p:nth-of-type(2) { transition-delay: 1.75s; }
+
+        .about.visible .about-text p {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Projects Section */
+        .projects {
+            width: 100%;
+            min-height: 100vh;
+            padding: 120px 0;
+            background: #000;
+            position: relative;
+        }
+
+        .projects::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.15), transparent);
+        }
+
+        .projects::after {
+            content: 'SECTION_02';
+            position: absolute;
+            top: 20px;
+            right: 80px;
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: #333;
+        }
+        
+        .projects-header {
+            padding: 0 80px 80px;
+        }
+
+        .projects-header h2 {
+            font-size: 64px;
+            letter-spacing: 2px;
+            font-weight: 100;
+            margin-bottom: 20px;
+            color: #ffffff;
+        }
+
+        .projects-header p {
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #888;
+            border-left: 2px solid rgba(255, 255, 255, 0.1);
+            padding-left: 12px;
+        }
+        
+        .projects-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+        
+        .project-card {
+            position: relative;
+            min-height: 70vh;
+            overflow: hidden;
+            cursor: pointer;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .project-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.3), transparent);
+            transition: height 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .project-card:hover::before {
+            height: 100%;
+        }
+
+        .project-card:last-child {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .project-image {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            background: #000;
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+
+        .project-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.8s ease;
+        }
+
+        .project-card:hover .project-image::after {
+            left: 100%;
+        }
+
+        .project-card.visible .project-image {
+            animation: slideInFromLeft 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .project-card:nth-child(1).visible .project-image { animation-delay: 0.2s; }
+        .project-card:nth-child(2).visible .project-image { animation-delay: 0.4s; }
+        .project-card:nth-child(3).visible .project-image { animation-delay: 0.6s; }
+
+        .project-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            filter: brightness(0.8) saturate(1.2);
+            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), filter 0.6s ease;
+        }
+
+        .project-card:hover .project-image img {
+            transform: scale(1.03);
+            filter: brightness(0.9) saturate(1.3);
+        }
+
+        .project-number {
+            position: absolute;
+            top: 50%;
+            left: 80px;
+            transform: translateY(-50%);
+            font-size: 100px;
+            font-weight: 100;
+            letter-spacing: 4px;
+            color: #ffffff;
+            opacity: 0.5;
+            z-index: 2;
+            mix-blend-mode: overlay;
+            transition: opacity 0.4s ease;
+        }
+
+        .project-card:hover .project-number {
+            opacity: 0.8;
+        }
+
+        .project-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px 80px;
+            background: #000;
+            flex-grow: 1;
+        }
+        
+        .project-card h3 {
+            font-size: 48px;
+            font-weight: 100;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            color: #ffffff;
+        }
+
+        .project-card:hover h3 {
+            transform: translateX(10px);
+        }
+        
+        .project-card p {
+            font-size: 18px;
+            line-height: 1.9;
+            color: #888;
+            max-width: 600px;
+            opacity: 0.9;
+            transition: opacity 0.4s ease;
+        }
+
+        .project-card:hover p {
+            opacity: 1;
+        }
+
+        .project-meta {
+            margin-top: 30px;
+            display: flex;
+            gap: 30px;
+        }
+
+        .project-meta span {
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            color: #888;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.02);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .project-meta span:hover {
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        .view-project-btn {
+            display: inline-block;
+            margin-top: 30px;
+            padding: 14px 36px;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #888;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.02);
+            text-decoration: none;
+            transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+            cursor: pointer;
+            font-family: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .view-project-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: #00b8a8;
+            transition: left 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+            z-index: -1;
+        }
+
+        .view-project-btn:hover::before {
+            left: 0;
+        }
+
+        .view-project-btn:hover {
+            color: #000;
+            border-color: #00b8a8;
+        }
+        
+        /* Gallery Section */
+        .gallery {
+            width: 100%;
+            padding: 120px 80px 80px;
+            background-color: #000;
+            position: relative;
+        }
+
+        .gallery::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.15), transparent);
+        }
+
+        .gallery::after {
+            content: 'SECTION_03';
+            position: absolute;
+            top: 20px;
+            right: 80px;
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: #333;
+        }
+        
+        .gallery h2 {
+            font-size: 64px;
+            margin-bottom: 80px;
+            padding-left: 0;
+            letter-spacing: 2px;
+            font-weight: 100;
+            color: #ffffff;
+        }
+        
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0;
+            height: 70vh;
+        }
+        
+        .gallery-item {
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            overflow: hidden;
+            opacity: 0;
+            outline: 1px solid transparent;
+            transition: opacity 0.8s ease-in-out;
+            cursor: default;
+            position: relative;
+            pointer-events: none;
+        }
+
+        .gallery-item.loaded {
+            pointer-events: auto;
+            cursor: pointer;
+            transition: opacity 0.8s ease-in-out, outline 0.2s ease;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: none;
+        }
+
+        .gallery-item.loaded img {
+            transition: filter 0.3s ease;
+        }
+
+        .gallery-item-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: none;
+            pointer-events: none;
+        }
+
+        .gallery-item.loaded .gallery-item-overlay {
+            transition: opacity 0.3s ease;
+        }
+
+        .gallery-item.loaded:hover .gallery-item-overlay {
+            opacity: 1;
+        }
+
+        .gallery-item.loaded:hover img {
+            filter: brightness(0.3);
+        }
+
+        .gallery-item-label {
+            font-size: 72px;
+            font-weight: 100;
+            letter-spacing: 8px;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .gallery-item-sublabel {
+            font-size: 12px;
+            letter-spacing: 3px;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .gallery.visible .gallery-item {
+            opacity: 1;
+        }
+
+        .gallery.visible .gallery-item:nth-child(1) { transition-delay: 0s; }
+        .gallery.visible .gallery-item:nth-child(2) { transition-delay: 0.3s; }
+        .gallery.visible .gallery-item:nth-child(3) { transition-delay: 0.6s; }
+        .gallery.visible .gallery-item:nth-child(4) { transition-delay: 0.9s; }
+        .gallery.visible .gallery-item:nth-child(5) { transition-delay: 1.2s; }
+        
+        /* CTA Section */
+        .cta {
+            width: 100%;
+            padding: 150px 80px;
+            background-color: #000;
+            text-align: center;
+            position: relative;
+        }
+
+        .cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+        }
+        
+        .cta h2 {
+            font-size: 72px;
+            margin-bottom: 50px;
+            letter-spacing: 2px;
+            font-weight: 100;
+            color: #ffffff;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .cta-button {
+            padding: 20px 50px;
+            font-size: 13px;
+            background-color: transparent;
+            color: #888;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-family: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            transition: left 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            z-index: -1;
+        }
+
+        .cta-button:hover::before {
+            left: 0;
+        }
+        
+        .cta-button:hover {
+            color: #000;
+            border-color: #fff;
+        }
+
+        footer {
+            padding: 60px 80px;
+            background: #000;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 40px;
+        }
+
+        .footer-links a {
+            color: #666;
+            text-decoration: none;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #aaa;
+        }
+
+        .footer-copy {
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #666;
+        }
+
+        .footer-copy span {
+            display: inline-block;
+            transition: color 0.15s ease;
+        }
+
+        .footer-copy span.cyan {
+            color: #00b8a8;
+        }
+        
+        /* Animations */
+        @keyframes titleFadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        
+        @keyframes subtitleFadeIn {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes scrollIndicatorFade {
+            0% { opacity: 0; transform: translate(-50%, 10px); }
+            100% { opacity: 1; transform: translate(-50%, 0); }
+        }
+
+        @keyframes scrollLineMove {
+            0%, 100% { transform: scaleY(1); transform-origin: top; }
+            50% { transform: scaleY(0.5); transform-origin: top; }
+        }
+
+        @keyframes navFadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes pageLoadFadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes slideInFromLeft {
+            0% { 
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            100% { 
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes glitch {
+            0%   { transform: translate(0); }
+            20%  { transform: translate(-2px, 2px); }
+            40%  { transform: translate(-2px, -2px); }
+            60%  { transform: translate(2px, 2px); }
+            80%  { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+
+        @keyframes grainMove {
+            0%, 100% { transform: translate(0, 0); }
+            10% { transform: translate(-5%, -10%); }
+            30% { transform: translate(3%, -15%); }
+            50% { transform: translate(12%, 9%); }
+            70% { transform: translate(9%, 4%); }
+            90% { transform: translate(-1%, 7%); }
+        }
+
+        @keyframes floatPixel {
+            0% {
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% {
+                transform: translateY(-100px) translateX(var(--drift)) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes videoGrowth {
+            0% {
+                width: 100px;
+                height: 100px;
+                opacity: 0;
+            }
+            100% {
+                width: 600px;
+                height: 600px;
+                opacity: 0.4;
+            }
+        }
+
+        @keyframes imageAppear {
+            0% { opacity: 0; }
+            100% { opacity: 0.4; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Technical Grid Overlay -->
+    <div class="tech-grid"></div>
+    
+    <!-- Pixelation overlay for transitions -->
+    <canvas class="pixelation-overlay" id="pixelation-canvas"></canvas>
+    
+    <!-- HUD Elements -->
+    <div class="version-hud">
+        v2.1.1<br>
+        STATUS: ONLINE
+    </div>
+    <div class="coords-hud">
+        X: <span id="coord-x">0000</span> Y: <span id="coord-y">0000</span>
+    </div>
+    
+    <!-- Corner Brackets -->
+    <div class="corner-brackets">
+        <div class="corner-bracket top-left"></div>
+        <div class="corner-bracket top-right"></div>
+        <div class="corner-bracket bottom-left"></div>
+        <div class="corner-bracket bottom-right"></div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div id="background"></div>
+        <div class="pixel-particles" id="pixel-particles"></div>
+        <div class="hero-text">
+            <div class="hero-image-container">
+                <img src="./new.png" alt="Hero Background">
+            </div>
+            <h1>anoaeyto</h1>
+            <p>designer / developer / storyteller</p>
+        </div>
+        <div class="scroll-indicator">
+            <span>Scroll</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- Nav -->
+    <nav class="nav">
+        <a href="#about">About</a>
+        <a href="#projects">Projects</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#contact">Contact</a>
+        <a href="#">CV</a>
+    </nav>
+    
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="about-image-wrapper" id="about-image-wrapper">
+            <img src="./landing/life.jpg" alt="About" id="about-img">
+            <canvas id="about-reveal-canvas"></canvas>
+        </div>
+        <div class="about-text">
+            <h2>Hello, this is anoaeyto</h2>
+            <p class="about-intro">I'm Matilda, and I like to create and explore through telling stories.</p>
+            <div class="about-skills">
+                <span>Adobe Creative Cloud Suite</span>
+                 <span>Blender</span>
+                    <span>Aseprite</span>
+                    <span>TouchDesigner</span>
+                <span>Unity</span>
+                <span>Python</span>
+                <span>HTML/CSS</span>
+            </div>
+            <p>I have an undergraduate degree in Astrophysics and am fascinated by the intersection of science, art, and technology.</p>
+            <p>From design, world building, to interactive installations, I love to learn and document my journey.</p>
+        </div>
+    </section>
+    
+    <!-- Projects Section -->
+    <section class="projects" id="projects">
+        <div class="projects-header">
+            <h2>Selected Works</h2>
+            <p>Recent Projects & Explorations</p>
+        </div>
+        <div class="projects-grid">
+            <div class="project-card">
+                <div class="project-image">
+                    <img src="./projects/IMG_6226.JPG" alt="Cosmic Interlude of the Nebular Web">
+                    <div class="project-number">01</div>
+                </div>
+                <div class="project-content">
+                    <h3>Cosmic Interlude of the Nebular Web</h3>
+                    <p>A responsive audiovisual experience exploring galaxy and star formation through interactive digital art. Visitors can manipulate cosmic elements and observe the evolution of stellar structures in real-time.</p>
+                    <div class="project-meta">
+                        <span>Interactive Installation</span>
+                        <span>2025</span>
+                        <span>TouchDesigner / Unity / Photoshop</span>
+                    </div>
+                    <a href="./project.html?id=celestial-narratives" class="view-project-btn">View Project</a>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-image">
+                    <img src="./projects/poster.jpg" alt="Quantum Dreams">
+                    <div class="project-number">02</div>
+                </div>
+                <div class="project-content">
+                    <h3>UNIVERSITY OF WATERLOO: TEA CLUB</h3>
+                    <p>Comprehensive brand development, social media management, and website design for the University of Waterloo Tea Club. This project involved creating a cohesive visual identity that reflects the warmth and community of tea culture.</p>
+                    <div class="project-meta">
+                        <span>Brand Development & Digital Design</span>
+                        <span>2024-2025</span>
+                        <span>Blender / Adobe CC Suite / HTML/CSS</span>
+                    </div>
+                    <a href="./project.html?id=quantum-dreams" class="view-project-btn">View Project</a>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-image">
+                    <img src="./projects/Untitled7.png" alt="Neural Landscapes">
+                    <div class="project-number">03</div>
+                </div>
+                <div class="project-content">
+                    <h3>PHIL KLINE'S UNSILENT NIGHT: POLYRHYTHMIC ILLUMINATION</h3>
+                    <p>An immersive audiovisual installation exploring the intersection of polyrhythmic music and dynamic lighting. This project reimagines Phil Kline's Unsilent Night through synchronized LED patterns and spatial audio design.</p>
+                    <div class="project-meta">
+                        <span>Audiovisual Installation</span>
+                        <span>2025-Present</span>
+                        <span>MAX MSP 8 / Arduino C++ / Blender</span>
+                    </div>
+                    <a href="./project.html?id=neural-landscapes" class="view-project-btn">View Project</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Gallery Section -->
+    <section class="gallery" id="gallery">
+        <h2>Gallery</h2>
+        <div class="gallery-grid">
+            <div class="gallery-item" data-focus="center center">
+                <img src="./landing/Untitled_3.png" alt="">
+                <div class="gallery-item-overlay">
+                    <div class="gallery-item-label">04</div>
+                    <div class="gallery-item-sublabel">Abstract</div>
+                </div>
+            </div>
+            <div class="gallery-item" data-focus="40% 30%">
+                <img src="./landing/12_12_2025_10.png" alt="">
+                <div class="gallery-item-overlay">
+                    <div class="gallery-item-label">05</div>
+                    <div class="gallery-item-sublabel">Environment</div>
+                </div>
+            </div>
+            <div class="gallery-item" data-focus="center center">
+                <img src="./landing/flame.jpg" alt="">
+                <div class="gallery-item-overlay">
+                    <div class="gallery-item-label">06</div>
+                    <div class="gallery-item-sublabel">Character</div>
+                </div>
+            </div>
+            <div class="gallery-item" data-focus="53.5% 40%">
+                <img src="./landing/NCD00073.JPG" alt="">
+                <div class="gallery-item-overlay">
+                    <div class="gallery-item-label">07</div>
+                    <div class="gallery-item-sublabel">Photography</div>
+                </div>
+            </div>
+            <div class="gallery-item" data-focus="45% center">
+                <img src="./landing/nNCD00654.JPG" alt="">
+                <div class="gallery-item-overlay">
+                    <div class="gallery-item-label">08</div>
+                    <div class="gallery-item-sublabel">Lotus</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta" id="contact">
+        <h2>Get In Touch</h2>
+        <div class="cta-buttons">
+            <button class="cta-button">Download CV</button>
+            <button class="cta-button">Contact Me</button>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="https://www.instagram.com/anoaeyto/" target="_blank">Instagram</a>
+                <a href="www.linkedin.com/in/matilda-pawlega-973383220" target="_blank">LinkedIn</a>
+                <a href="https://github.com/mpawlega" target="_blank">GitHub</a>
+            </div>
+            <div class="footer-copy" id="copyright-text">
+                © 2026 anoaeyto
+            </div>
+        </div>
+    </footer>
+
+    <script>
+    // ============================================================
+    // COPYRIGHT TEXT ANIMATION - Wave effect with one cyan character at a time
+    // ============================================================
+    (function() {
+        const copyrightEl = document.getElementById('copyright-text');
+        const originalText = '© 2026 anoaeyto';
+        
+        // Split text into individual characters wrapped in spans
+        copyrightEl.innerHTML = originalText.split('').map(char => 
+            `<span>${char}</span>`
+        ).join('');
+        
+        const chars = copyrightEl.querySelectorAll('span');
+        let isAnimating = false;
+        
+        function animateCopyright() {
+            if (isAnimating) return;
+            isAnimating = true;
+            
+            let currentChar = 0;
+            
+            // Animate each character sequentially - only one cyan at a time
+            const charInterval = setInterval(() => {
+                if (currentChar < chars.length) {
+                    // Remove cyan from previous character
+                    if (currentChar > 0) {
+                        chars[currentChar - 1].classList.remove('cyan');
+                    }
+                    // Add cyan to current character
+                    chars[currentChar].classList.add('cyan');
+                    currentChar++;
+                } else {
+                    // Remove cyan from last character
+                    chars[chars.length - 1].classList.remove('cyan');
+                    clearInterval(charInterval);
+                    isAnimating = false;
+                    
+                    // Wait 3 seconds before starting again
+                    setTimeout(animateCopyright, 3000);
+                }
+            }, 150); // 150ms delay between each character
+        }
+        
+        // Start the animation after page loads
+        setTimeout(animateCopyright, 2000);
+    })();
+
+    // ABOUT IMAGE — square-chunk reveal from TOP TO BOTTOM (smooth)
+    // ============================================================
+    (function() {
+        const wrapper   = document.getElementById('about-image-wrapper');
+        const canvas    = document.getElementById('about-reveal-canvas');
+        const ctx       = canvas.getContext('2d');
+        let CHUNK       = 100;  // Will be calculated based on width
+        let chunks      = [];          // { cx, cy, revealAt }
+        let initialized = false;
+        let hasRevealed = false;
+
+        function init() {
+            const rect = wrapper.getBoundingClientRect();
+            canvas.width  = rect.width;
+            canvas.height = rect.height;
+            
+            // Define the number of chunks you want across the width (e.g., 8 chunks = perfectly square)
+            const chunksAcross = 12;  // Change this number to subdivide differently (e.g., 4, 6, 10, 12)
+            
+            // Calculate chunk size to divide width evenly
+            CHUNK = Math.floor(rect.width / chunksAcross);
+
+            const cols = chunksAcross;  
+            const rows = Math.floor(rect.height / CHUNK)
+            chunks = [];
+
+            // Create chunks sorted by Y position with staggered horizontal reveal
+            const tempChunks = [];
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const cy = r * CHUNK;
+                    const cx = c * CHUNK;
+                    
+                    // Primary reveal is by row (Y position)
+                    const rowProgress = cy / (rows * CHUNK);
+                    
+                    // Add horizontal stagger within each row - creates a wave effect
+                    const colStagger = (c / cols) * 0.15;  // Columns reveal slightly offset
+                    const rowJitter = ((c * 7 + r * 13) % 11) / 11 * 0.08;
+                    
+                    tempChunks.push({
+                        cx: cx,
+                        cy: cy,
+                        revealAt: rowProgress + colStagger + rowJitter
+                    });
+                }
+            }
+            
+            // Sort by revealAt time for smooth top-to-bottom flow
+            chunks = tempChunks.sort((a, b) => a.revealAt - b.revealAt);
+
+            // Start fully black
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            initialized = true;
+        }
+
+        function draw(progress) {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.globalCompositeOperation = 'destination-out';
+            ctx.fillStyle = 'rgba(0,0,0,1)';
+            
+            for (let i = 0; i < chunks.length; i++) {
+                if (progress >= chunks[i].revealAt) {
+                    ctx.fillRect(chunks[i].cx, chunks[i].cy, CHUNK, CHUNK);
+                }
+            }
+            ctx.globalCompositeOperation = 'source-over';
+        }
+
+        function onScroll() {
+            const rect  = wrapper.getBoundingClientRect();
+            const viewH = window.innerHeight;
+            
+            // Slower, more gradual reveal
+            const enterAt = viewH;
+            const endAt   = viewH * 0.35;  // Increased from 0.25 for smoother feel
+            let progress = Math.max(0, Math.min(1,
+                (enterAt - rect.top) / (enterAt - endAt)
+            ));
+            
+            // Cap progress at 0.8 so bottom squares never fully load
+            progress = Math.min(progress, 0.8);
+
+            if (!initialized) init();
+            
+            if (progress < 0.8) {
+                draw(progress);
+            } else if (!hasRevealed) {
+                // When at max, freeze at 80% - don't clear canvas
+                draw(0.8);
+                hasRevealed = true;
+            }
+        }
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+    })();
+
+    // ============================================================
+    // GALLERY IMAGE LOADING & GEOMETRIC DISSOLVE TRANSITION
+    // ============================================================
+    (function() {
+        const galleryItems = document.querySelectorAll('.gallery-item');
+        const pixelCanvas = document.getElementById('pixelation-canvas');
+        const pixelCtx = pixelCanvas.getContext('2d');
+
+        // Apply custom focus positions to images
+        galleryItems.forEach((item) => {
+            const img = item.querySelector('img');
+            const focusPosition = item.getAttribute('data-focus') || 'center center';
+            img.style.objectPosition = focusPosition;
+        });
+
+        // Wait for 5th item's animation to complete before enabling hover
+        const fifthItem = galleryItems[4]; // 0-indexed, so 5th item is index 4
+        
+        if (fifthItem) {
+            fifthItem.addEventListener('transitionend', function handler(e) {
+                // Only trigger on opacity transition (the main fade-in)
+                if (e.propertyName === 'opacity') {
+                    // Enable hover on all items
+                    galleryItems.forEach((item) => {
+                        item.classList.add('loaded');
+                    });
+                    // Remove listener after it fires once
+                    fifthItem.removeEventListener('transitionend', handler);
+                }
+            });
+        }
+        
+        // Set canvas to full window size
+        function resizePixelCanvas() {
+            pixelCanvas.width = window.innerWidth;
+            pixelCanvas.height = window.innerHeight;
+        }
+        resizePixelCanvas();
+        window.addEventListener('resize', resizePixelCanvas);
+
+        galleryItems.forEach((item) => {
+            item.addEventListener('click', function() {
+                if (!this.classList.contains('loaded')) return;
+                
+                const rect = this.getBoundingClientRect();
+                const label = this.querySelector('.gallery-item-label').textContent;
+                
+                // Start geometric dissolve transition
+                triggerPixelationTransition(rect, () => {
+                    window.location.href = `./gallery.html?id=gallery-${label}`;
+                });
+            });
+        });
+
+        // ============================================================
+        // Organic Radial Gradient Transition with Jagged Edges
+        // ============================================================
+        function triggerPixelationTransition(startRect, callback) {
+            pixelCanvas.classList.add('active');
+            
+            const ps = 8; // pixel size
+            const cols = Math.ceil(pixelCanvas.width / ps) + 1;
+            const rows = Math.ceil(pixelCanvas.height / ps) + 1;
+            
+            // Always start from center of screen for consistent effect
+            const cx = Math.floor(cols / 2);
+            const cy = Math.floor(rows / 2);
+            
+            const visited = new Set();
+            let frontier = [];
+            
+            function k(x, y) { return x + ',' + y; }
+            function inB(x, y) { return x >= 0 && x < cols && y >= 0 && y < rows; }
+            
+            // Calculate distance from center for gradient
+            function getDistance(gx, gy) {
+                const dx = gx - cx;
+                const dy = gy - cy;
+                return Math.sqrt(dx * dx + dy * dy);
+            }
+            
+            // Max distance to corners
+            const maxDist = Math.sqrt(cx * cx + cy * cy);
+            
+            function draw(gx, gy, distFromCenter) {
+    const palette = [
+        [0, 184, 168],   // cyan
+        [220, 80, 30],   // orange
+        [100, 160, 60]   // green
+    ];
+
+    const [r, g, b] = palette[Math.floor(Math.random() * palette.length)];
+
+    pixelCtx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.6)`;
+    pixelCtx.fillRect(gx * ps, gy * ps, ps, ps);
+}
+
+            
+            // Seed center point
+            visited.add(k(cx, cy));
+            frontier.push({ gx: cx, gy: cy, dist: 0 });
+            
+            const startTime = performance.now();
+            const TOTAL_TIME = 1200;
+            
+            function animate(now) {
+                
+                const progress = Math.min((now - startTime) / TOTAL_TIME, 1);
+                const budget = Math.floor((30 + progress * 220) * 10); // Higher multiplier to reach corners
+                const fireChance = 0.2 + progress * 0.7; // 0.2→0.9 - brings back randomness
+                
+                let fired = 0;
+                const keep = [];
+                const spawn = [];
+                
+                for (let i = 0; i < frontier.length; i++) {
+                    if (fired >= budget) {
+                        keep.push(frontier[i]);
+                        continue;
+                    }
+                    
+                    // Random firing creates jagged edges
+                    if (Math.random() < fireChance) {
+                        const { gx, gy, dist } = frontier[i];
+                        draw(gx, gy, dist);
+                        fired++;
+                        
+                        // Add all 4 cardinal neighbors
+                        const neighbors = [
+                            { dx: 0, dy: -1 },
+                            { dx: 1, dy: 0 },
+                            { dx: 0, dy: 1 },
+                            { dx: -1, dy: 0 }
+                        ];
+                        
+                        neighbors.forEach(({ dx, dy }) => {
+                            const nx = gx + dx;
+                            const ny = gy + dy;
+                            const nk = k(nx, ny);
+                            
+                            if (inB(nx, ny) && !visited.has(nk)) {
+                                visited.add(nk);
+                                const newDist = getDistance(nx, ny);
+                                spawn.push({ gx: nx, gy: ny, dist: newDist });
+                            }
+                        });
+                        
+                        // Sometimes add diagonals for more organic spread
+                        if (Math.random() > 0.5) {
+                            const diagonals = [
+                                { dx: 1, dy: 1 }, { dx: -1, dy: 1 },
+                                { dx: 1, dy: -1 }, { dx: -1, dy: -1 }
+                            ];
+                            const diag = diagonals[Math.floor(Math.random() * diagonals.length)];
+                            const nx = gx + diag.dx;
+                            const ny = gy + diag.dy;
+                            const nk = k(nx, ny);
+                            
+                            if (inB(nx, ny) && !visited.has(nk)) {
+                                visited.add(nk);
+                                const newDist = getDistance(nx, ny);
+                                spawn.push({ gx: nx, gy: ny, dist: newDist });
+                            }
+                        }
+                    } else {
+                        keep.push(frontier[i]);
+                    }
+                }
+                
+                frontier = keep.concat(spawn);
+                
+                // Continue until screen is filled
+                const fillPercentage = visited.size / (cols * rows);
+                
+                if (fillPercentage < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    setTimeout(() => {
+                        callback();
+                    }, 100);
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        }
+    })();
+
+    // ============================================================
+    // GALLERY HOVER INTERACTIONS (only when loaded)
+    // ============================================================
+    document.querySelectorAll('.gallery-item').forEach((item, idx) => {
+        item.addEventListener('mouseenter', () => {
+            if (!item.classList.contains('loaded')) return;
+            
+            document.querySelectorAll('.gallery-item').forEach(other => {
+                if (other !== item) {
+                    other.style.opacity = '0.3';
+                    other.style.outline = '1px solid transparent';
+                }
+            });
+            item.style.outline = '1px solid white';
+        });
+        
+        item.addEventListener('mouseleave', () => {
+            if (!item.classList.contains('loaded')) return;
+            
+            document.querySelectorAll('.gallery-item').forEach(other => {
+                other.style.opacity = '1';
+                other.style.outline = '1px solid transparent';
+            });
+        });
+    });
+
+    // ============================================================
+    // INTERSECTION OBSERVER — section reveal
+    // ============================================================
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+
+                if (entry.target.classList.contains('gallery')) {
+                    setTimeout(() => {
+                        entry.target.querySelectorAll('.gallery-item').forEach(item => {
+                            item.style.transitionDelay = '0s';
+                            item.style.transition = 'opacity 0.2s ease, outline 0.2s ease';
+                        });
+                    }, 1400);
+                }
+            }
+        });
+    }, { threshold: 0.25 });
+
+    document.querySelectorAll('.about, .gallery, .project-card').forEach(el => observer.observe(el));
+
+    // ============================================================
+    // SMOOTH SCROLL FOR NAV
+    // ============================================================
+    document.querySelectorAll('.nav a').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            const href = this.getAttribute('href');
+            if (href.startsWith('#')) {
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) target.scrollIntoView({ behavior: 'smooth' });
+            }
+        });
+    });
+
+    // ============================================================
+    // MOUSE COORDINATE TRACKER
+    // ============================================================
+    document.addEventListener('mousemove', (e) => {
+        document.getElementById('coord-x').textContent = String(e.clientX).padStart(4, '0');
+        document.getElementById('coord-y').textContent = String(e.clientY).padStart(4, '0');
+    });
+
+    // ============================================================
+    // PIXEL PARTICLES (hero)
+    // ============================================================
+    (function createPixelParticles() {
+        const container = document.getElementById('pixel-particles');
+        for (let i = 0; i < 30; i++) {
+            const pixel = document.createElement('div');
+            pixel.className = 'pixel';
+            const sizeClass = ['small', 'medium', 'large'][Math.floor(Math.random() * 3)];
+            if (sizeClass) pixel.classList.add(sizeClass);
+            pixel.style.left = Math.random() * 100 + '%';
+            pixel.style.animationDuration = (15 + Math.random() * 20) + 's';
+            pixel.style.animationDelay   = (Math.random() * 10) + 's';
+            pixel.style.setProperty('--drift', ((Math.random() - 0.5) * 200) + 'px');
+            container.appendChild(pixel);
+        }
+    })();
+    </script>
+</body>
+</html>

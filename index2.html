@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>anoaeyto - Enhanced Portfolio</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+:root {
+    --accent-olive: #8b9456;
+    --accent-green: #6b7c3f;
+    --dark-bg: #0a0a0a;
+    --darker-bg: #050505;
+    --border-color: #2a2a2a;
+    --text-muted: #b0b0b0;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-user-select: none; 
+    -ms-user-select: none;     
+    user-select: none;         
+    -webkit-user-drag: none;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+html, body {
+    width: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    background: var(--dark-bg);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+}
+
+html.no-scroll,
+body.no-scroll {
+    overflow: hidden;
+}
+
+/* ================= ENTER SCREEN ================= */
+
+.enter-screen {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 1.4s ease, transform 1.4s ease, visibility 0s 0s;
+    background-color: var(--darker-bg);
+}
+
+.enter-screen::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    transition: filter 0.4s ease, opacity 1s ease;
+    z-index: 1;
+}
+
+.enter-screen h1 {
+    font-size: 1.8rem;
+    letter-spacing: 4px;
+    margin-bottom: 12px;
+    font-weight: 300;
+}
+
+.enter-screen p {
+    font-size: 3.5rem;
+    letter-spacing: 8px;
+    margin-bottom: 40px;
+    font-weight: 300;
+}
+
+.enter-screen h1,
+.enter-screen p,
+.enter-button {
+    position: relative;
+    z-index: 10;
+}
+
+.enter-screen.blur::before {
+    filter: blur(6px);
+}
+
+.enter-screen.hidden {
+    opacity: 0;
+    transform: scale(1.1);
+    visibility: hidden;
+    transition: opacity 1.4s ease, transform 1.4s ease, visibility 0s 1.4s;
+    pointer-events: none;
+}
+
+.enter-button {
+    padding: 16px 48px;
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid var(--accent-olive);
+    color: #fff;
+    letter-spacing: 3px;
+    font-size: 1.1rem;
+    font-weight: 300; 
+    cursor: pointer;
+    transform: scale(1);
+    will-change: transform; 
+    backface-visibility: hidden;
+    -webkit-font-smoothing: antialiased;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
+                background 0.4s ease,
+                border-color 0.4s ease;
+}
+
+.enter-button:hover {
+    transform: scale(1.1);
+    background: rgba(139, 148, 86, 0.15);
+    border-color: var(--accent-green);
+}
+
+/* ================= MAIN ================= */
+
+.main-content {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 1.2s ease 0.5s, visibility 0s 1.7s;
+}
+
+.main-content.visible {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 1.2s ease 0.5s, visibility 0s 0s;
+}
+
+/* ================= HERO ================= */
+
+.hero {
+    width: 100vw;
+    min-height: 100vh;
+    position: relative;
+    display: flex;
+    max-width: none; 
+    padding: 0; 
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    background: linear-gradient(135deg, #1a1a1a 0%, var(--darker-bg) 100%);
+    filter: blur(0px);
+    mask-image: linear-gradient(to bottom, 
+        rgba(0,0,0,1) 85%, 
+        rgba(0,0,0,1) 90%, 
+        rgba(0,0,0,0.3) 95%, 
+        rgba(0,0,0,0) 100%);
+    -webkit-mask-image: linear-gradient(to bottom, 
+        rgba(0,0,0,1) 85%, 
+        rgba(0,0,0,1) 90%, 
+        rgba(0,0,0,0.3) 95%, 
+        rgba(0,0,0,0) 100%);
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(139, 148, 86, 0.03) 2px, rgba(139, 148, 86, 0.03) 4px),
+        repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(139, 148, 86, 0.03) 2px, rgba(139, 148, 86, 0.03) 4px);
+    filter: blur(1px);
+    z-index: 1;
+    transform: scale(1.3);
+    transition: transform 2s ease-out;
+}
+
+/* Darker overlay for moodier feel */
+.hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, 
+        rgba(10, 10, 10, 0.4) 0%, 
+        rgba(139, 148, 86, 0.1) 50%,
+        rgba(5, 5, 5, 0.6) 100%);
+    z-index: 2;
+}
+
+.main-content.visible .hero::before {
+    transform: scale(1);
+}
+
+.hero-content {
+    position: relative;
+    z-index: 3;
+    text-align: center;
+    transform: scale(1.5);
+    opacity: 0;
+    transition: transform 2s ease-out, opacity 1.5s ease-out;
+}
+
+.main-content.visible .hero-content {
+    transform: scale(1);
+    opacity: 1;
+}
+
+.hero h1 {
+    font-size: clamp(3rem, 6vw, 5rem);
+    font-weight: 300;
+    letter-spacing: 8px;
+    margin-bottom: 16px;
+    text-shadow: 0 0 20px rgba(139, 148, 86, 0.3);
+}
+
+.hero p {
+    font-size: 1.4em;
+    font-weight: 300;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+}
+
+/* ================= NAV ================= */
+
+nav {
+    text-align: center;
+    padding: 28px 0;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--darker-bg);
+}
+
+nav a {
+    color: #fff;
+    margin: 0 22px;
+    text-decoration: none;
+    letter-spacing: 1px;
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+    font-size: 1.4em;
+}
+
+nav a:hover,
+nav a:active {
+    color: var(--accent-olive);
+    text-shadow: 0 0 10px rgba(139, 148, 86, 0.4);
+}
+
+/* ================= SECTIONS ================= */
+
+section:not(.hero) {
+    max-width: 1200px; 
+    margin: auto;
+    padding: 90px 40px;
+}
+
+h2 {
+    text-align: center;
+    letter-spacing: 4px;
+    margin-bottom: 60px;
+    font-size: 1.8rem;
+    font-weight: normal;
+    color: var(--accent-olive);
+}
+
+.divider {
+    border-top: 1px solid var(--border-color);
+    margin-bottom: 30px;
+}
+
+/* ================= ABOUT ================= */
+
+.about-content {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 60px;
+    align-items: start; 
+}
+
+.about-items {
+    background: rgba(139, 148, 86, 0.05);
+    padding: 30px 25px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+}
+
+.about-items .item {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.8s ease, transform 0.8s ease, color 0.3s ease;
+    font-size: 20px;
+    margin-bottom: 18px;
+    padding: 8px 0;
+    color: var(--text-muted);
+    border-bottom: 1px solid transparent;
+}
+
+.about-items .item:last-child {
+    margin-bottom: 0;
+}
+
+.about-items .item:hover {
+    color: var(--accent-olive);
+    border-bottom-color: var(--accent-olive);
+}
+
+.about-items .item:nth-child(1) { transition-delay: 0s; }
+.about-items .item:nth-child(2) { transition-delay: 0.1s; }
+.about-items .item:nth-child(3) { transition-delay: 0.2s; }
+.about-items .item:nth-child(4) { transition-delay: 0.3s; }
+.about-items .item:nth-child(5) { transition-delay: 0.4s; }
+.about-items .item:nth-child(6) { transition-delay: 0.5s; }
+.about-items .item:nth-child(7) { transition-delay: 0.6s; }
+
+.about-items .item.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.about-image {
+    width: 100%;
+    margin-bottom: 40px;
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
+    position: relative;
+    overflow: hidden;
+}
+
+.about-text p {
+    font-size: clamp(3rem, 6vw, 5rem);
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 1.5s ease, transform 1.5s ease;
+    margin: 0;
+    line-height: 1;
+    margin-top: -0.13em;
+}
+
+.about-text p em {
+    color: var(--accent-olive);
+    font-style: normal;
+}
+
+.about-text p.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.about-text p.smaller-text {
+    font-size: 40px;
+    line-height: 1.5;
+    margin-top: 20px;
+    color: var(--text-muted);
+}
+
+/* ================= PROJECTS GRID ================= */
+
+.projects-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+    max-height: 900px;
+    overflow: hidden;
+    transition: max-height 0.6s ease;
+}
+
+.projects-grid.show-all {
+    max-height: none;
+}
+
+.project-item {
+    text-align: center;
+    cursor: pointer;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    text-decoration: none;
+    color: #fff;
+    display: block;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    padding: 10px;
+    background: rgba(139, 148, 86, 0.02);
+}
+
+.project-item:nth-child(n+7) {
+    display: none;
+}
+
+.projects-grid.show-all .project-item:nth-child(n+7) {
+    display: block;
+}
+
+.project-item:hover {
+    opacity: 0.9;
+    border-color: var(--accent-olive);
+    background: rgba(139, 148, 86, 0.05);
+}
+
+.project-item:hover img {
+    transform: scale(1.03);
+}
+
+.project-item img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    margin-bottom: 20px;
+    border-radius: 4px;
+    transition: transform 0.3s ease;
+    background: #1a1a1a;
+}
+
+.project-info {
+    text-align: left;
+    padding: 0 10px;
+}
+
+.project-item h3 {
+    font-weight: 400;
+    font-size: 25px;
+    margin-bottom: 8px;
+    line-height: 1.1;
+    color: var(--accent-olive);
+}
+
+.project-meta {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.project-type,
+.project-date {
+    font-size: 14px;
+    font-weight: 300;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+}
+
+.project-type::after {
+    content: "•";
+    margin-left: 12px;
+    opacity: 0.5;
+}
+
+.project-description {
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 300;
+    color: var(--text-muted);
+    margin-top: 8px;
+}
+
+.see-more-container {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.see-more-btn {
+    padding: 14px 40px;
+    background: rgba(0, 0, 0, 0.55);
+    border: 1px solid var(--accent-olive);
+    color: #fff;
+    letter-spacing: 2px;
+    font-size: 1rem;
+    font-weight: 300;
+    cursor: pointer;
+    transition: transform 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+}
+
+.see-more-btn:hover {
+    transform: scale(1.05);
+    background: rgba(139, 148, 86, 0.15);
+    border-color: var(--accent-green);
+}
+
+/* ================= CONTACT ================= */
+
+.contact-icons {
+    display: flex;
+    justify-content: center;
+    gap: 42px;
+}
+
+.contact-icons svg {
+    width: 36px;
+    height: 36px;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    fill: var(--accent-olive);
+}
+
+.contact-icons a:hover svg {
+    transform: translateY(-4px);
+    fill: #fff;
+}
+
+/* ================= FOOTER ================= */
+
+footer {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border-color);
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 900px) {
+    .about-content { 
+        grid-template-columns: 1fr; 
+    }
+    .projects-grid {
+        grid-template-columns: 1fr;
+        max-height: 1800px;
+    }
+}
+
+@media (max-width: 500px) {
+    .enter-screen p { 
+        font-size: 2.5rem; 
+    }
+    .projects-grid {
+        gap: 30px;
+    }
+    nav a {
+        margin: 0 12px;
+        font-size: 1.2em;
+    }
+}
+    </style>
+</head>
+<body>
+
+<div class="enter-screen" id="enterScreen">
+    <h1>hello, this is</h1>
+    <p>anoaeyto</p>
+    <button class="enter-button">enter</button>
+</div>
+
+<div class="main-content" id="mainContent">
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>anoaeyto</h1>
+            <p>Creative Technologist and Designer</p>
+        </div>
+    </section>
+
+    <nav>
+        <a href="#about">About</a>
+        <a href="#projects">Projects</a>
+        <a href="#contact">Contact</a>
+        <a href="#cv">CV</a>
+    </nav>
+
+    <section id="about">
+    
+    <h2>ABOUT</h2>
+    
+    <div class="about-content">
+        <div class="about-left">
+            <img src="https://placehold.co/300x400/1a1a1a/8b9456?text=Profile+Image" alt="About Image" class="about-image">
+            
+            <div class="about-items">
+                <div class="item">Adobe Creative Suite</div>
+                <div class="item">Unreal Engine</div>
+                <div class="item">Unity</div>
+                <div class="item">TouchDesigner</div>
+                <div class="item">Blender</div>
+                <div class="item">Aseprite</div>
+                <div class="item">Python</div>
+            </div>
+        </div>
+
+        <div class="about-text">
+            <p>
+                Hello, this is <em>anoaeyto</em>! 
+            </p>
+
+            <p class="smaller-text">
+                My name is Matilda, I like to create and explore through telling stories. I have an undergraduate degree in Astrophysics and am fascinated by the intersection of science, art, and technology. From game design, creative coding, arduino, to sculpting, I love to learn and document my journey.
+            </p>
+        </div>
+    </div>
+</section>
+
+    <section id="projects">
+        <div class="divider"></div>
+        <h2>PROJECTS</h2>
+        <div class="projects-grid" id="projectsGrid">
+            <a href="#" class="project-item">
+                <img src="https://placehold.co/600x338/1a1a1a/8b9456?text=Unsilent+Night">
+                <div class="project-info">
+                    <h3>Phil Kline's Unsilent Night</h3>
+                    <div class="project-meta">
+                        <span class="project-type">Installation / Performance</span>
+                        <span class="project-date">December 2024</span>
+                    </div>
+                    <p class="project-description">A participatory sound installation where audiences become part of a moving outdoor sound sculpture.</p>
+                </div>
+            </a>
+            <a href="#" class="project-item">
+                <img src="https://placehold.co/600x338/1a1a1a/8b9456?text=ALT-VERSE">
+                <div class="project-info">
+                    <h3>ALT-VERSE: THE MUSEUM EYEPOOL</h3>
+                    <div class="project-meta">
+                        <span class="project-type">Exhibition / Interactive Art</span>
+                        <span class="project-date">2024</span>
+                    </div>
+                    <p class="project-description">An immersive interactive art installation exploring alternate realities and viewer participation.</p>
+                </div>
+            </a>
+            <a href="#" class="project-item">
+                <img src="https://placehold.co/600x338/1a1a1a/8b9456?text=Tea+Club">
+                <div class="project-info">
+                    <h3>University of Waterloo Tea Club</h3>
+                    <div class="project-meta">
+                        <span class="project-type">Marketing / Branding</span>
+                        <span class="project-date">2023-2024</span>
+                    </div>
+                    <p class="project-description">Visual identity and promotional materials for a campus community organization.</p>
+                </div>
+            </a>
+            <a href="#" class="project-item">
+                <img src="https://placehold.co/600x338/1a1a1a/8b9456?text=Playground">
+                <div class="project-info">
+                    <h3>anoaeyto's Playground</h3>
+                    <div class="project-meta">
+                        <span class="project-type">Experimental / Archive</span>
+                        <span class="project-date">Ongoing</span>
+                    </div>
+                    <p class="project-description">A collection of experimental works, creative coding sketches, and digital explorations.</p>
+                </div>
+            </a>
+        </div>
+        <div class="see-more-container" id="seeMoreContainer" style="display: none;">
+            <button class="see-more-btn" id="seeMoreBtn" onclick="toggleProjects()">See More</button>
+        </div>
+    </section>
+
+    <section id="contact">
+        <div class="divider"></div>
+        <h2>CONTACT</h2>
+
+        <div class="contact-icons">
+            <a href="https://www.linkedin.com/in/matilda-pawlega-973383220/" target="_blank">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                </svg>
+            </a>
+            <a href="mailto:contact@example.com">
+                <svg viewBox="0 0 24 24">
+                    <path d="M0 3v18h24v-18h-24zm6.623 7.929l-4.623 5.712v-9.458l4.623 3.746zm-4.141-5.929h19.035l-9.517 7.713-9.518-7.713zm5.694 7.188l3.824 3.099 3.83-3.104 5.612 6.817h-18.779l5.513-6.812zm9.208-1.264l4.616-3.741v9.348l-4.616-5.607z"/>
+                </svg>
+            </a>
+            <a href="https://github.com/mpawlega" target="_blank">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+            </a>
+            <a href="https://www.instagram.com/anoaeyto/" target="_blank">
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                </svg>
+            </a>
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2026 anoaeyto. All rights reserved.</p>
+    </footer>
+
+</div>
+
+<script>
+// Always scroll to top and disable scroll restoration
+if ('scrollRestoration' in history) {
+    history.scrollRestoration = 'manual';
+}
+
+window.scrollTo(0, 0);
+
+// Enter screen functionality
+const enterScreen = document.getElementById('enterScreen');
+const enterButton = document.querySelector('.enter-button');
+const mainContent = document.getElementById('mainContent');
+
+enterScreen.style.opacity = '1';
+enterScreen.style.visibility = 'visible';
+enterScreen.style.pointerEvents = 'all';
+
+if (sessionStorage.getItem('visited') === 'true') {
+    enterScreen.style.display = 'none';
+    mainContent.classList.add('visible');
+    document.documentElement.classList.remove('no-scroll');
+} else {
+    enterScreen.style.display = 'flex';
+    document.documentElement.classList.add('no-scroll');
+}
+
+enterButton.addEventListener('mouseenter', () => {
+    enterScreen.classList.add('blur');
+});
+
+enterButton.addEventListener('mouseleave', () => {
+    enterScreen.classList.remove('blur');
+});
+
+enterButton.addEventListener('click', () => {
+    sessionStorage.setItem('visited', 'true');
+    enterScreen.classList.add('hidden');
+    mainContent.classList.add('visible');
+    
+    setTimeout(() => {
+        enterScreen.style.display = 'none';
+        document.documentElement.classList.remove('no-scroll');
+    }, 1400);
+});
+
+// Projects Grid Logic
+let showingAllProjects = false;
+
+function toggleProjects() {
+    const projectsGrid = document.getElementById('projectsGrid');
+    const seeMoreBtn = document.getElementById('seeMoreBtn');
+    
+    showingAllProjects = !showingAllProjects;
+    
+    if (showingAllProjects) {
+        projectsGrid.classList.add('show-all');
+        seeMoreBtn.textContent = 'See Less';
+    } else {
+        projectsGrid.classList.remove('show-all');
+        seeMoreBtn.textContent = 'See More';
+        document.getElementById('projects').scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+// Intersection Observer
+const observerOptions = {
+    threshold: 0.3,
+    rootMargin: '0px 0px -100px 0px'
+};
+
+const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+        }
+    });
+}, observerOptions);
+
+const aboutTextElements = document.querySelectorAll('.about-text p');
+aboutTextElements.forEach(p => {
+    observer.observe(p);
+});
+
+const aboutItems = document.querySelectorAll('.about-items .item');
+aboutItems.forEach(item => {
+    observer.observe(item);
+});
+</script>
+
+</body>
+</html>

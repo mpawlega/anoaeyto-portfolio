@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>anoaeyto - Portfolio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+        
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Eurostile', 'Eurostile Extended', sans-serif;
+            overflow-x: hidden;
+            opacity: 0;
+            animation: pageLoadFadeIn 0.8s ease-in-out forwards;
+        }
+        
+        /* Hero Section - More Dynamic */
+        .hero {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        #background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 0;
+            opacity: 1;
+        }
+
+        .bg-gradient {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .hero:hover .bg-gradient {
+            opacity: 1;
+        }
+
+        .bg-gradient::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.15) 0%, transparent 50%);
+        }
+        
+        .hero-text {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+        
+        .hero-text h1 {
+            font-size: 140px;
+            font-weight: 100;
+            letter-spacing: 8px;
+            -webkit-font-smoothing: antialiased;
+            mix-blend-mode: screen;
+            text-transform: lowercase;
+            opacity: 0;
+            animation: titleFadeIn 0.8s ease-in-out forwards;
+            animation-delay: 0.3s;
+            position: relative;
+        }
+
+        .hero-text h1::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background-image: url('./home/bg1.png');
+            background-size: 200%;
+            background-position: center;
+            background-repeat: no-repeat;
+            z-index: -1;
+            pointer-events: none;
+            mix-blend-mode: screen;
+            opacity: 0.4;
+            mask-image: radial-gradient(circle, black 0%, black 40%, transparent 70%);
+            -webkit-mask-image: radial-gradient(circle, black 0%, black 40%, transparent 70%);
+        }
+        
+        .hero-text p {
+            font-size: 11px;
+            font-weight: normal;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            opacity: 0;
+            animation: subtitleFadeIn 0.8s ease-in-out forwards;
+            animation-delay: 0.9s;
+            margin-top: 30px;
+            color: #666;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            opacity: 0;
+            animation: scrollIndicatorFade 0.8s ease-in-out forwards;
+            animation-delay: 1.5s;
+        }
+
+        .scroll-indicator span {
+            display: block;
+            font-size: 9px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 15px;
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 60px;
+            background: linear-gradient(to bottom, #666, transparent);
+            margin: 0 auto;
+            animation: scrollLineMove 2s ease-in-out infinite;
+        }
+
+        /* Nav - Minimal Top Bar */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            justify-content: center;
+            gap: 50px;
+            padding: 30px 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            opacity: 0;
+            animation: navFadeIn 0.6s ease-in-out forwards;
+            animation-delay: 1.8s;
+        }
+
+        .nav a {
+            color: #666;
+            text-decoration: none;
+            font-size: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .nav a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: #fff;
+            transition: width 0.3s ease;
+        }
+
+        .nav a:hover {
+            color: #fff;
+        }
+
+        .nav a:hover::after {
+            width: 100%;
+        }
+        
+        /* About Section - Keep your mechanics */
+        .about {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            background-color: #000;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .about::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+        }
+        
+        .about-image-wrapper {
+            width: 25%;
+            height: 60vh;
+            position: relative;
+            overflow: hidden;
+            transform: translateX(-100%);
+            transition: transform 1.1s cubic-bezier(0.22, 1, 0.36, 1);
+            flex-shrink: 0;
+            align-self: center;
+            margin-left: 60px;
+        }
+
+        .about.visible .about-image-wrapper {
+            transform: translateX(0);
+        }
+
+        .about-image-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center 30%;
+            display: block;
+            filter: saturate(0.6) brightness(0.8);
+            transition: filter 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.4s;
+        }
+
+        .about.visible .about-image-wrapper img {
+            filter: saturate(1) brightness(1);
+        }
+        
+        .about-text {
+            width: 75%;
+            padding: 60px 80px;
+        }
+        
+        .about-text h2 {
+            font-size: 64px;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+            font-weight: 100;
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+            transition-delay: 0.85s;
+        }
+
+        .about.visible .about-text h2 {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .about-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px 24px;
+            margin-bottom: 50px;
+        }
+
+        .about-skills span {
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #444;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1), transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), color 0.3s ease;
+        }
+
+        .about-skills span:hover {
+            color: #888;
+        }
+
+        .about.visible .about-skills span {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .about.visible .about-skills span:nth-child(1) { transition-delay: 1s; }
+        .about.visible .about-skills span:nth-child(2) { transition-delay: 1.08s; }
+        .about.visible .about-skills span:nth-child(3) { transition-delay: 1.16s; }
+        .about.visible .about-skills span:nth-child(4) { transition-delay: 1.24s; }
+        .about.visible .about-skills span:nth-child(5) { transition-delay: 1.32s; }
+        .about.visible .about-skills span:nth-child(6) { transition-delay: 1.4s; }
+        .about.visible .about-skills span:nth-child(7) { transition-delay: 1.48s; }
+        
+        .about-text p {
+            font-size: 15px;
+            line-height: 2;
+            color: #888;
+            margin-bottom: 20px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .about-text p:nth-of-type(1) { transition-delay: 1.6s; }
+        .about-text p:nth-of-type(2) { transition-delay: 1.75s; }
+
+        .about.visible .about-text p {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Projects Section - Dramatic Grid */
+        .projects {
+            width: 100%;
+            min-height: 100vh;
+            padding: 120px 0;
+            background: #000;
+            position: relative;
+        }
+
+        .projects::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+        }
+        
+        .projects-header {
+            padding: 0 80px 80px;
+        }
+
+        .projects-header h2 {
+            font-size: 64px;
+            letter-spacing: 2px;
+            font-weight: 100;
+            margin-bottom: 20px;
+        }
+
+        .projects-header p {
+            font-size: 11px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #444;
+        }
+        
+        .projects-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+        
+        .project-card {
+            position: relative;
+            min-height: 70vh;
+            overflow: hidden;
+            cursor: pointer;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .project-card:last-child {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .project-image {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            background: #0a0a0a;
+            transform: translateX(-100%);
+            opacity: 0;
+        }
+
+        .project-card.visible .project-image {
+            animation: slideInFromLeft 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        .project-card:nth-child(1).visible .project-image {
+            animation-delay: 0.2s;
+        }
+
+        .project-card:nth-child(2).visible .project-image {
+            animation-delay: 0.4s;
+        }
+
+        .project-card:nth-child(3).visible .project-image {
+            animation-delay: 0.6s;
+        }
+
+        .project-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            filter: brightness(0.5) saturate(0.7);
+            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), filter 0.6s ease;
+        }
+
+        .project-card:hover .project-image img {
+            transform: scale(1.03);
+            filter: brightness(0.7) saturate(1);
+        }
+
+        .project-number {
+            position: absolute;
+            top: 50%;
+            left: 80px;
+            transform: translateY(-50%);
+            font-size: 120px;
+            font-weight: 100;
+            letter-spacing: 4px;
+            color: white;
+            opacity: 0.4;
+            z-index: 2;
+            mix-blend-mode: overlay;
+            transition: opacity 0.4s ease;
+        }
+
+        .project-card:hover .project-number {
+            opacity: 0.6;
+        }
+
+        .project-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px 80px;
+            background: #000;
+            flex-grow: 1;
+        }
+        
+        .project-card h3 {
+            font-size: 48px;
+            font-weight: 100;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .project-card:hover h3 {
+            transform: translateX(10px);
+        }
+        
+        .project-card p {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #666;
+            max-width: 600px;
+            opacity: 0.7;
+            transition: opacity 0.4s ease;
+        }
+
+        .project-card:hover p {
+            opacity: 1;
+        }
+
+        .project-meta {
+            margin-top: 30px;
+            display: flex;
+            gap: 40px;
+        }
+
+        .project-meta span {
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #444;
+        }
+        
+        /* Gallery Section - Keep as is */
+        .gallery {
+            width: 100%;
+            padding: 120px 80px 80px;
+            background-color: #000;
+            position: relative;
+        }
+
+        .gallery::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+        }
+        
+        .gallery h2 {
+            font-size: 64px;
+            margin-bottom: 80px;
+            padding-left: 0;
+            letter-spacing: 2px;
+            font-weight: 100;
+        }
+        
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 0;
+            height: 70vh;
+        }
+        
+        .gallery-item {
+            width: 100%;
+            height: 100%;
+            background-color: #0a0a0a;
+            overflow: hidden;
+            opacity: 0;
+            outline: 1px solid transparent;
+            transition: opacity 0.8s ease-in-out, outline 0.2s ease;
+            cursor: pointer;
+            position: relative;
+            pointer-events: none;
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            display: block;
+            transition: filter 0.3s ease;
+        }
+
+        .gallery-item-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+
+        .gallery-item:hover .gallery-item-overlay {
+            opacity: 1;
+        }
+
+        .gallery-item:hover img {
+            filter: brightness(0.3);
+        }
+
+        .gallery-item-label {
+            font-size: 72px;
+            font-weight: 100;
+            letter-spacing: 8px;
+            color: #fff;
+            margin-bottom: 15px;
+        }
+
+        .gallery-item-sublabel {
+            font-size: 10px;
+            letter-spacing: 3px;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .gallery.visible .gallery-item {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .gallery.visible .gallery-item:nth-child(1) { transition-delay: 0s; }
+        .gallery.visible .gallery-item:nth-child(2) { transition-delay: 0.3s; }
+        .gallery.visible .gallery-item:nth-child(3) { transition-delay: 0.6s; }
+        .gallery.visible .gallery-item:nth-child(4) { transition-delay: 0.9s; }
+        .gallery.visible .gallery-item:nth-child(5) { transition-delay: 1.2s; }
+        
+        /* CTA Section - Enhanced */
+        .cta {
+            width: 100%;
+            padding: 150px 80px;
+            background-color: #000;
+            text-align: center;
+            position: relative;
+        }
+
+        .cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+        }
+        
+        .cta h2 {
+            font-size: 64px;
+            margin-bottom: 50px;
+            letter-spacing: 2px;
+            font-weight: 100;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .cta-button {
+            padding: 20px 50px;
+            font-size: 11px;
+            background-color: transparent;
+            color: #666;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-family: inherit;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: #fff;
+            transition: left 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+            z-index: -1;
+        }
+
+        .cta-button:hover::before {
+            left: 0;
+        }
+        
+        .cta-button:hover {
+            color: #000;
+            border-color: #fff;
+        }
+
+        footer {
+            padding: 60px 80px;
+            background: #000;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 40px;
+        }
+
+        .footer-links a {
+            color: #444;
+            text-decoration: none;
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #888;
+        }
+
+        .footer-copy {
+            font-size: 10px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #444;
+        }
+        
+        /* Animations */
+        @keyframes titleFadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+        
+        @keyframes subtitleFadeIn {
+            0% { opacity: 0; transform: translateY(10px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes scrollIndicatorFade {
+            0% { opacity: 0; transform: translate(-50%, 10px); }
+            100% { opacity: 1; transform: translate(-50%, 0); }
+        }
+
+        @keyframes scrollLineMove {
+            0%, 100% { transform: scaleY(1); transform-origin: top; }
+            50% { transform: scaleY(0.5); transform-origin: top; }
+        }
+
+        @keyframes navFadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes gradientPulse {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes pageLoadFadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        @keyframes slideInFromLeft {
+            0% { 
+                transform: translateX(-100%);
+                opacity: 0;
+            }
+            100% { 
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div id="background"></div>
+        <div class="bg-gradient"></div>
+        <div class="hero-text">
+            <h1>anoaeyto</h1>
+            <p>designer / developer / storyteller</p>
+        </div>
+        <div class="scroll-indicator">
+            <span>Scroll</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- Nav -->
+    <nav class="nav">
+        <a href="#about">About</a>
+        <a href="#projects">Projects</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#contact">Contact</a>
+        <a href="#">CV</a>
+    </nav>
+    
+    <!-- About Section -->
+    <section class="about" id="about">
+        <div class="about-image-wrapper">
+            <img src="./home/life.jpg" alt="About">
+        </div>
+        <div class="about-text">
+            <h2>About Me</h2>
+            <div class="about-skills">
+                <span>Adobe Creative Suite</span>
+                <span>Unreal Engine</span>
+                <span>Unity</span>
+                <span>TouchDesigner</span>
+                <span>Blender</span>
+                <span>Aseprite</span>
+                <span>Python</span>
+            </div>
+            <p>Hello, this is anoaeyto! My name is Matilda, I like to create and explore through telling stories. I have an undergraduate degree in Astrophysics and am fascinated by the intersection of science, art, and technology.</p>
+            <p>From game design, creative coding, arduino, to sculpting, I love to learn and document my journey.</p>
+        </div>
+    </section>
+    
+    <!-- Projects Section -->
+    <section class="projects" id="projects">
+        <div class="projects-header">
+            <h2>Selected Works</h2>
+            <p>Recent Projects & Explorations</p>
+        </div>
+        <div class="projects-grid">
+            <div class="project-card">
+                <div class="project-image">
+                    <img src="./projects/IMG_6226.JPG" alt="Celestial Narratives">
+                    <div class="project-number">01</div>
+                </div>
+                <div class="project-content">
+                    <h3>Celestial Narratives</h3>
+                    <p>An interactive installation exploring the intersection of astrophysics and generative art. Built with TouchDesigner and custom shaders to visualize cosmic phenomena through real-time data.</p>
+                    <div class="project-meta">
+                        <span>Interactive Installation</span>
+                        <span>2024</span>
+                        <span>TouchDesigner / GLSL</span>
+                    </div>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-image">
+                    <img src="./projects/poster.jpg" alt="Quantum Dreams">
+                    <div class="project-number">02</div>
+                </div>
+                <div class="project-content">
+                    <h3>Quantum Dreams</h3>
+                    <p>A narrative-driven game experience that blends science fiction with quantum mechanics concepts. Developed in Unity with custom particle systems and procedural generation.</p>
+                    <div class="project-meta">
+                        <span>Game Design</span>
+                        <span>2024</span>
+                        <span>Unity / C#</span>
+                    </div>
+                </div>
+            </div>
+            <div class="project-card">
+                <div class="project-image">
+                    <img src="./projects/Untitled7.png" alt="Neural Landscapes">
+                    <div class="project-number">03</div>
+                </div>
+                <div class="project-content">
+                    <h3>Neural Landscapes</h3>
+                    <p>Experimental creative coding project generating evolving landscapes through neural network interpretations. Combines Python, machine learning, and real-time visualization.</p>
+                    <div class="project-meta">
+                        <span>Creative Coding</span>
+                        <span>2023</span>
+                        <span>Python / ML</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Gallery Section -->
+    <section class="gallery" id="gallery">
+        <h2>Gallery</h2>
+        <div class="gallery-grid">
+            <div class="gallery-item">
+                <img src="./landing/Untitled_3.png" alt="">
+                <div class="gallery-item-overlay">
+                    <div class="gallery-item-label">A</div>
+                    <div class="gallery-item-sublabel">Visual Exploration</div>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="./landing/12_12_2025_10.png" alt="">
+                <div class="gallery-item-overlay">
+                    <div class="gallery-item-label">B</div>
+                    <div class="gallery-item-sublabel">Digital Art</div>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="./landing/flame.jpg" alt="">
+                <div class="gallery-item-overlay">
+                    <div class="gallery-item-label">C</div>
+                    <div class="gallery-item-sublabel">Experimental</div>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="./landing/NCD00073.JPG" alt="">
+                <div class="gallery-item-overlay">
+                    <div class="gallery-item-label">D</div>
+                    <div class="gallery-item-sublabel">Photography</div>
+                </div>
+            </div>
+            <div class="gallery-item">
+                <img src="./landing/nNCD00654.JPG" alt="">
+                <div class="gallery-item-overlay">
+                    <div class="gallery-item-label">E</div>
+                    <div class="gallery-item-sublabel">Mixed Media</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- CTA Section -->
+    <section class="cta" id="contact">
+        <h2>Get In Touch</h2>
+        <div class="cta-buttons">
+            <button class="cta-button">Download CV</button>
+            <button class="cta-button">Contact Me</button>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#">Instagram</a>
+                <a href="#">LinkedIn</a>
+                <a href="#">GitHub</a>
+            </div>
+            <div class="footer-copy">
+                © 2026 anoaeyto
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+
+                    if (entry.target.classList.contains('gallery')) {
+                        setTimeout(() => {
+                            entry.target.querySelectorAll('.gallery-item').forEach(item => {
+                                item.style.transitionDelay = '0s';
+                                item.style.transition = 'opacity 0.2s ease, outline 0.2s ease';
+                            });
+                        }, 1400);
+                    }
+                }
+            });
+        }, { threshold: 0.25 });
+
+        document.querySelectorAll('.about, .gallery, .project-card').forEach(el => observer.observe(el));
+
+        // Gallery interactions
+        document.querySelectorAll('.gallery-item').forEach(item => {
+            item.addEventListener('mouseenter', () => {
+                document.querySelectorAll('.gallery-item').forEach(other => {
+                    if (other !== item) {
+                        other.style.opacity = '0.3';
+                        other.style.outline = '1px solid transparent';
+                    }
+                });
+                item.style.outline = '1px solid white';
+            });
+            item.addEventListener('mouseleave', () => {
+                document.querySelectorAll('.gallery-item').forEach(other => {
+                    other.style.opacity = '1';
+                    other.style.outline = '1px solid transparent';
+                });
+            });
+
+            item.addEventListener('click', () => {
+                const label = item.querySelector('.gallery-item-label').textContent;
+                console.log(`Navigate to project ${label}`);
+            });
+        });
+
+        // Smooth scroll for nav
+        document.querySelectorAll('.nav a').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href.startsWith('#')) {
+                    e.preventDefault();
+                    const target = document.querySelector(href);
+                    if (target) {
+                        target.scrollIntoView({ behavior: 'smooth' });
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

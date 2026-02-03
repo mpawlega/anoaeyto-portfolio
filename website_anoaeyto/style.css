@@ -1,3 +1,10 @@
+@font-face {
+    font-family: 'Eurostile Extended';
+    src: url('Eurostile_Extended_Regular.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
 * {
     margin: 0;
     padding: 0;
@@ -42,41 +49,130 @@ body.no-scroll {
     visibility: visible;
     transition: opacity 1.4s ease, transform 1.4s ease, visibility 0s 0s;
     background-color: #000;
+    overflow: hidden;
+}
+
+/* Perlin noise canvas - on background only */
+#perlinCanvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    opacity: 0.25;
+    mix-blend-mode: screen;
+}
+
+#dustCanvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 5;
 }
 
 .enter-screen::before {
     content: '';
     position: absolute;
     inset: 0;
-    background-size: cover;
-    background-position: center;
-    transition: filter 0.4s ease, opacity 1s ease;
-    z-index: 1;
+    background-image: url('images/gallery/bg1.png');
+    background-size: 350%;
+    background-position: 35% 42%;
+    filter: blur(0px);
+    opacity: 0;
+    transform: scale(1);
+    transition: opacity 1s ease;
+    z-index: 2;
+    pointer-events: none;
 }
 
-.enter-screen h1 {
-    font-size: 1.8rem;
-    letter-spacing: 4px;
-    margin-bottom: 12px;
-    font-weight: 300;
+.enter-screen.show-image::before {
+    opacity: 1;
+    transform: scale(2.5);
 }
 
-.enter-screen p {
-    font-size: 3.5rem;
+.enter-title {
+    font-family: 'Eurostile Extended', sans-serif;
+    font-size: clamp(3rem, 6vw, 5rem);
     letter-spacing: 8px;
-    margin-bottom: 40px;
-    font-weight: 300;
-}
-
-.enter-screen h1,
-.enter-screen p,
-.enter-button {
+    font-weight: normal;
+    color: #fff;
+    cursor: pointer;
     position: relative;
     z-index: 10;
+    opacity: 0;
+    filter: drop-shadow(0 0 0px rgba(255, 255, 255, 0));
+    transition: 
+        transform 1s cubic-bezier(0.4, 0, 0.2, 1),
+        filter 1s ease,
+        opacity 1.5s ease;
+    transform: scale(1);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-.enter-screen.blur::before {
-    filter: blur(6px);
+.enter-screen.show-text .enter-title {
+    opacity: 1;
+}
+
+.enter-title:hover {
+    transform: scale(1.08);
+    filter: 
+        drop-shadow(0 0 8px rgba(255, 255, 255, 1))
+        drop-shadow(0 0 12px rgba(255, 255, 255, 0.9))
+        drop-shadow(0 0 16px rgba(255, 255, 255, 0.7));
+}
+
+/* Text expands more gradually when clicked */
+.enter-screen.expanding .enter-title {
+    transform: scale(1.35);
+    opacity: 1;
+    filter: none;
+    transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1), filter 0.3s ease;
+}
+
+/* Background fades in during expansion */
+.enter-screen.expanding::before {
+    opacity: 1;
+    transition: opacity 1s ease 0.3s;
+}
+
+/* Enter screen fades out smoothly */
+.enter-screen.fade-out {
+    opacity: 0;
+    transition: opacity 0.8s ease;
+}
+
+.enter-subtitle {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.6rem;
+    letter-spacing: 4px;
+    font-weight: 300;
+    color: #fff;
+    position: relative;
+    z-index: 10;
+    opacity: 0;
+    margin-top: 30px;
+    transition: opacity 1.5s ease;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.enter-screen.show-subtitle .enter-subtitle {
+    opacity: 0.7;
+}
+
+.enter-screen.zooming .enter-subtitle {
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+/* Faster transition to main content */
+.enter-screen.fade-to-main {
+    opacity: 0;
+    transition: opacity 0.8s ease;
 }
 
 .enter-screen.hidden {
@@ -87,40 +183,18 @@ body.no-scroll {
     pointer-events: none;
 }
 
-.enter-button {
-    padding: 16px 48px;
-    background: rgba(0, 0, 0, 0.55);
-    border: 1px solid #fff;
-    color: #fff;
-    letter-spacing: 3px;
-    font-size: 1.1rem;
-    font-weight: 300; 
-    cursor: pointer;
-    transform: scale(1);
-    will-change: transform; 
-    backface-visibility: hidden;
-    -webkit-font-smoothing: antialiased;
-    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
-                background 0.4s ease;
-}
-
-.enter-button:hover {
-    transform: scale(1.1);
-    background: rgba(255, 255, 255, 0.1); 
-}
-
 /* ================= MAIN ================= */
 
 .main-content {
     opacity: 0;
     visibility: hidden;
-    transition: opacity 1.2s ease 0.5s, visibility 0s 1.7s;
+    transition: opacity 0.8s ease, visibility 0s 0.8s;
 }
 
 .main-content.visible {
     opacity: 1;
     visibility: visible;
-    transition: opacity 1.2s ease 0.5s, visibility 0s 0s;
+    transition: opacity 0.8s ease, visibility 0s 0s;
 }
 
 /* ================= HERO ================= */
@@ -136,17 +210,6 @@ body.no-scroll {
     align-items: center;
     overflow: hidden;
     background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
-    filter: blur(0px);
-    mask-image: linear-gradient(to bottom, 
-        rgba(0,0,0,1) 85%, 
-        rgba(0,0,0,1) 90%, 
-        rgba(0,0,0,0.3) 95%, 
-        rgba(0,0,0,0) 100%);
-    -webkit-mask-image: linear-gradient(to bottom, 
-        rgba(0,0,0,1) 85%, 
-        rgba(0,0,0,1) 90%, 
-        rgba(0,0,0,0.3) 95%, 
-        rgba(0,0,0,0) 100%);
 }
 
 .hero::before {
@@ -156,44 +219,49 @@ body.no-scroll {
     width: 100%;
     height: 100%;
     background-image: url('images/gallery/bg1.png');
-    background-size: cover;
-    background-position: center center;
+    background-size: 350%;
+    background-position: 35% 42%;
     background-repeat: no-repeat;
-    filter: blur(5px);
+    filter: blur(0px);
     z-index: 1;
-    transform: scale(1.3);
-    transition: transform 2s ease-out;
-}
-
-.main-content.visible .hero::before {
-    transform: scale(1);
+    opacity: 1;
 }
 
 .hero-content {
     position: relative;
     z-index: 3;
     text-align: center;
-    transform: scale(1.5);
-    opacity: 0;
-    transition: transform 2s ease-out, opacity 1.5s ease-out;
-}
-
-.main-content.visible .hero-content {
-    transform: scale(1);
     opacity: 1;
+    transform: scale(1);
 }
 
 .hero h1 {
+    font-family: 'Eurostile Extended', sans-serif;
     font-size: clamp(3rem, 6vw, 5rem);
-    font-weight: 300;
+    font-weight: normal;
     letter-spacing: 8px;
     margin-bottom: 16px;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+}
+
+.main-content.visible .hero h1 {
+    opacity: 1;
 }
 
 .hero p {
     font-size: 1.4em;
     font-weight: 300;
     letter-spacing: 2px;
+    opacity: 0;
+    transition: opacity 1s ease 2s;
+}
+
+.main-content.visible .hero p {
+    opacity: 1;
 }
 
 /* ================= NAV ================= */
@@ -466,10 +534,7 @@ h2 {
 .project-item {
     text-align: center;
     cursor: pointer;
-    transition: opacity 0.3s ease;
-    text-decoration: none;
-    color: #fff;
-    display: block;
+    transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .project-item:nth-child(n+7) {
@@ -481,11 +546,8 @@ h2 {
 }
 
 .project-item:hover {
-    opacity: 0.9;
-}
-
-.project-item:hover img {
     transform: scale(1.03);
+    opacity: 0.8;
 }
 
 .project-item img {
@@ -494,48 +556,11 @@ h2 {
     object-fit: cover;
     margin-bottom: 20px;
     border-radius: 4px;
-    transition: transform 0.3s ease;
-}
-
-.project-info {
-    text-align: left;
-    padding: 0 10px;
 }
 
 .project-item h3 {
     font-weight: 400;
     font-size: 25px;
-    margin-bottom: 8px;
-    line-height: 1.1;
-}
-
-.project-meta {
-    display: flex;
-    gap: 12px;
-    margin-bottom: 12px;
-    flex-wrap: wrap;
-}
-
-.project-type,
-.project-date {
-    font-size: 14px;
-    font-weight: 300;
-    /*opacity: 0.7;*/
-    letter-spacing: 0.5px;
-}
-
-.project-type::after {
-    content: "•";
-    margin-left: 12px;
-    opacity: 0.5;
-}
-
-.project-description {
-    font-size: 16px;
-    line-height: 1.5;
-    font-weight: 300;
-     /*opacity: 0.7;*/
-    margin-top: 8px;
 }
 
 .see-more-container {
@@ -653,16 +678,21 @@ footer {
         grid-template-columns: 1fr;
         max-height: 1800px;
     }
+    .enter-title {
+        font-size: clamp(3rem, 10vw, 7rem);
+        letter-spacing: 10px;
+    }
 }
 
 @media (max-width: 500px) {
     .gallery-grid { 
         column-count: 1; 
     }
-    .enter-screen p { 
-        font-size: 2.5rem; 
-    }
     .projects-grid {
         gap: 30px;
+    }
+    .enter-title {
+        font-size: clamp(2rem, 8vw, 5rem);
+        letter-spacing: 5px;
     }
 }

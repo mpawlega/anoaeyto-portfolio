@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gallery - anoaeyto</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+        
+        body {
+            background-color: #000;
+            color: #d4d4d4;
+            font-family: 'Eurostile', 'Eurostile Extended', monospace;
+            overflow-x: hidden;
+            height: 100vh;
+        }
+
+        .tech-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 184, 168, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 184, 168, 0.03) 1px, transparent 1px),
+                linear-gradient(rgba(0, 184, 168, 0.01) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 184, 168, 0.01) 1px, transparent 1px);
+            background-size: 
+                50px 50px,
+                50px 50px,
+                25px 25px,
+                25px 25px;
+            z-index: 0;
+            pointer-events: none;
+            opacity: 0.15;
+        }
+
+        .version-hud {
+            position: fixed;
+            top: 10px;
+            right: 20px;
+            font-size: 11px;
+            letter-spacing: 1px;
+            color: #00b8a8;
+            z-index: 9997;
+            text-align: right;
+            line-height: 1.6;
+        }
+
+        .coords-hud {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            font-size: 11px;
+            letter-spacing: 1px;
+            color: #00b8a8;
+            z-index: 9997;
+        }
+
+        /* Main Container */
+        .gallery-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 0;
+            width: 100%;
+            height: 100vh;
+            position: relative;
+            z-index: 10;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 60px;
+        }
+
+        /* LEFT SIDE - Image Viewer */
+        .gallery-viewer {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+        }
+
+        .image-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 30px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.6);
+            flex-shrink: 0;
+        }
+
+        .image-title {
+            font-size: 14px;
+            letter-spacing: 2px;
+            color: #00b8a8;
+            font-family: monospace;
+        }
+
+        .image-counter {
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        /* Main Image Viewer */
+        .main-image-area {
+            position: relative;
+            flex: 1;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .main-image-area img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center;
+            display: block;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        .main-image-area img.transitioning {
+            opacity: 0;
+        }
+
+        #pixel-reveal-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        /* Thumbnail Grid */
+        .thumbnail-section {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            flex-shrink: 0;
+            overflow-y: auto;
+            max-height: 200px;
+        }
+
+        .thumbnail-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 12px;
+        }
+
+        .thumbnail-item {
+            position: relative;
+            aspect-ratio: 1;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background: rgba(0, 0, 0, 0.4);
+            opacity: 0.6;
+        }
+
+        .thumbnail-item.empty {
+            background: rgba(0, 0, 0, 0.2);
+            cursor: default;
+            opacity: 0.6;
+        }
+
+        .thumbnail-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .thumbnail-item:hover:not(.empty) {
+            border-color: rgba(0, 184, 168, 0.8);
+            box-shadow: 0 0 15px rgba(0, 184, 168, 0.2);
+            opacity: 1;
+        }
+
+        .thumbnail-item.empty:hover {
+            border-color: rgba(0, 184, 168, 0.4);
+            opacity: 0.6;
+        }
+
+        .thumbnail-item.active {
+            border-color: rgba(0, 184, 168, 0.8);
+            box-shadow: 0 0 20px rgba(0, 184, 168, 0.3);
+            opacity: 1;
+        }
+
+        /* RIGHT SIDE - Info Panel */
+        .gallery-info {
+            display: flex;
+            flex-direction: column;
+            padding: 80px 40px;
+            overflow-y: auto;
+            gap: 30px;
+        }
+
+        .gallery-info h2 {
+            font-size: 36px;
+            font-weight: 100;
+            letter-spacing: 2px;
+            color: #ffffff;
+            line-height: 1.4;
+        }
+
+        .info-label {
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .info-text {
+            font-size: 14px;
+            line-height: 1.8;
+            color: #999;
+        }
+
+        .info-divider {
+            width: 100%;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .info-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-top: 60px;
+        }
+
+        .meta-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+        }
+
+        .meta-label {
+            color: #666;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .meta-value {
+            color: #00b8a8;
+            letter-spacing: 1px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 14px 0;
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #888;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            line-height: 1.4;
+            margin-top: auto;
+        }
+
+        .nav-link:hover {
+            color: #00b8a8;
+        }
+
+        .image-counter {
+            font-size: 11px;
+            letter-spacing: 2px;
+            color: #00b8a8;
+            text-transform: uppercase;
+        }
+
+        /* Lightbox */
+        .lightbox {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.98);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .lightbox.active {
+            display: flex;
+        }
+
+        .lightbox-content {
+            position: relative;
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .lightbox-image {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+        }
+
+        .lightbox-close {
+            position: absolute;
+            top: -40px;
+            right: 0;
+            background: none;
+            border: none;
+            color: #00b8a8;
+            font-size: 28px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .lightbox-close:hover {
+            color: #ffffff;
+        }
+
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #00b8a8;
+            font-size: 32px;
+            cursor: pointer;
+            padding: 20px;
+            transition: color 0.3s ease;
+            z-index: 10001;
+        }
+
+        .lightbox-nav:hover {
+            color: #ffffff;
+        }
+
+        .lightbox-nav.prev {
+            left: -60px;
+        }
+
+        .lightbox-nav.next {
+            right: -60px;
+        }
+
+        /* Footer */
+        footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px 30px;
+            background: #000;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #666;
+            text-align: center;
+            z-index: 9;
+        }
+
+        /* Scrollbar styling */
+        .gallery-info::-webkit-scrollbar,
+        .thumbnail-section::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .gallery-info::-webkit-scrollbar-track,
+        .thumbnail-section::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .gallery-info::-webkit-scrollbar-thumb,
+        .thumbnail-section::-webkit-scrollbar-thumb {
+            background: rgba(0, 184, 168, 0.3);
+            border-radius: 3px;
+        }
+
+        .gallery-info::-webkit-scrollbar-thumb:hover,
+        .thumbnail-section::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 184, 168, 0.5);
+        }
+
+        @media (max-width: 1024px) {
+            .gallery-wrapper {
+                grid-template-columns: 1fr;
+            }
+
+            .gallery-viewer {
+                border-right: none;
+            }
+
+            .gallery-info {
+                border-left: 1px solid rgba(255, 255, 255, 0.1);
+                max-height: 40vh;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .thumbnail-section {
+                max-height: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="tech-grid"></div>
+
+    <div class="version-hud">
+        v2.1.1<br>
+        STATUS: ONLINE
+    </div>
+    <div class="coords-hud">
+        X: <span id="coord-x">0000</span> Y: <span id="coord-y">0000</span>
+    </div>
+
+    <!-- Fullscreen Lightbox -->
+    <div class="lightbox" id="lightbox">
+        <button class="lightbox-nav prev" id="lightbox-prev">‹</button>
+        <div class="lightbox-content">
+            <img src="" alt="Fullscreen" id="lightbox-image" class="lightbox-image">
+            <button class="lightbox-close" id="lightbox-close">×</button>
+        </div>
+        <button class="lightbox-nav next" id="lightbox-next">›</button>
+    </div>
+
+    <!-- Main Gallery -->
+    <div class="gallery-wrapper">
+        <!-- LEFT SIDE -->
+        <div class="gallery-viewer">
+            <div class="image-header">
+                <div class="image-title" id="image-title">filename.jpg</div>
+                <div class="image-counter">
+                    <span id="current-index">1</span> / <span id="total-images">0</span>
+                </div>
+            </div>
+
+            <div class="main-image-area">
+                <img src="" alt="Gallery image" id="main-image" onload="createPixelReveal()">
+                <canvas id="pixel-reveal-canvas"></canvas>
+            </div>
+
+            <div class="thumbnail-section">
+                <div class="thumbnail-gallery" id="thumbnail-gallery"></div>
+            </div>
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="gallery-info">
+            <div>
+                <h2 id="gallery-title">Gallery</h2>
+                <div class="info-label" id="gallery-category">CATEGORY</div>
+            </div>
+
+            <div>
+                <p class="info-text" id="gallery-description">Description goes here.</p>
+            </div>
+
+            <div class="info-divider"></div>
+
+            <div class="info-meta">
+                <div class="meta-row">
+                    <span class="meta-label">Medium</span>
+                    <span class="meta-value" id="medium">—</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-label">Year</span>
+                    <span class="meta-value" id="year">—</span>
+                </div>
+                <div class="meta-row">
+                    <span class="meta-label">Images</span>
+                    <span class="meta-value" id="total-count">0</span>
+                </div>
+            </div>
+
+            <a href="./test.html#gallery" class="nav-link">← Back to Portfolio</a>
+        </div>
+    </div>
+
+    <footer>
+        © 2026 anoaeyto
+    </footer>
+
+    <script>
+        // Track mouse coordinates
+        document.addEventListener('mousemove', (e) => {
+            document.getElementById('coord-x').textContent = String(e.clientX).padStart(4, '0');
+            document.getElementById('coord-y').textContent = String(e.clientY).padStart(4, '0');
+        });
+
+        // Gallery data
+       const galleryData = {
+    'gallery-04': {
+        title: 'Abstract Exploration',
+        category: 'Abstract',
+        description: 'An exploration of color, form, and motion. This piece investigates the relationship between geometric patterns and organic flow.',
+        medium: 'Digital Art',
+        year: '2024',
+        images: [
+            'gallery/abstract/4.jpg',
+            'gallery/abstract/12_16_2025_1.png',
+            'gallery/abstract/bg1.png',
+            'gallery/abstract/cubes.png',
+            'gallery/abstract/july_1_1.jpg',
+            'gallery/abstract/july_4_5.jpg',
+            'gallery/abstract/july_24_5.jpg',
+            'gallery/abstract/july_24_10.jpg',
+            'gallery/abstract/june_3_2.jpg',
+            'gallery/abstract/june_3_10.jpg',
+            'gallery/abstract/june_3_28 - Copy.jpg',
+            'gallery/abstract/june_5_1.jpg',
+            'gallery/abstract/june_6_1.jpg',
+            'gallery/abstract/June_7_1.jpg',
+            'gallery/abstract/june_8_25.jpg',
+            'gallery/abstract/june_8_31.jpg',
+            'gallery/abstract/june_9_37.jpg',
+            'gallery/abstract/june_12_5.jpg',
+            'gallery/abstract/june_12_12.jpg',
+            'gallery/abstract/june_12_42.jpg',
+            'gallery/abstract/june_12_50.jpg',
+            'gallery/abstract/june_12_75.jpg',
+            'gallery/abstract/june_12_86.jpg',
+            'gallery/abstract/may_28_42.jpg',
+            'gallery/abstract/may_29_35.jpg',
+            'gallery/abstract/oct_5_2.jpg',
+            'gallery/abstract/Screenshot 2025-05-27 201051.jpg',
+            'gallery/abstract/Screenshot 2025-05-27 2010521.jpg',
+            'gallery/abstract/sept_6_3.jpg',
+            'gallery/abstract/sept_6_11.jpg',
+            'gallery/abstract/sept_6_15.jpg',
+            'gallery/abstract/sept_14_1.jpg',
+            'gallery/abstract/time1.jpg',
+            'gallery/abstract/Untitled_2.png',
+            'gallery/abstract/Untitled_3.png',
+            'gallery/abstract/Untitled.png'
+        ]
+    },
+    'gallery-05': {
+        title: 'Environmental Design',
+        category: 'Environment',
+        description: 'A collection of environmental design concepts and landscape studies exploring different lighting conditions and atmospheric effects.',
+        medium: 'Digital Painting',
+        year: '2024',
+        images: [
+            'gallery/environment/12_12_2025_10.png',
+            'gallery/environment/planeyts.png',
+            'gallery/environment/test3.png'
+        ]
+    },
+    'gallery-06': {
+        title: 'Character Design',
+        category: 'Character',
+        description: 'Character design exploration featuring different styles, expressions, and variations. Each character tells a story through visual design.',
+        medium: 'Digital Illustration',
+        year: '2024',
+        images: [
+            'gallery/character/dog4.jpg',
+            'gallery/character/dude_1.jpg',
+            'gallery/character/flame.jpg',
+            'gallery/character/july_6_13.jpg',
+            'gallery/character/july_26_bird.png',
+            'gallery/character/june_15_1.jpg',
+            'gallery/character/june_21_46.jpg',
+            'gallery/character/june_21_57.jpg',
+            'gallery/character/Screenshot 2025-06-04 114422.jpg',
+            'gallery/character/untitled - Copy.png',
+            'gallery/character/Untitled_5.png',
+            'gallery/character/unwritten_2.png'
+        ]
+    },
+    'gallery-07': {
+        title: 'Photography',
+        category: 'Photography',
+        description: 'A series of photographs exploring light, shadow, and composition. Each image captures a moment of technical and artistic interest.',
+        medium: 'Photography',
+        year: '2024',
+        images: [
+            'gallery/photography/NCD00031.JPG',
+            'gallery/photography/NCD00035.JPG',
+            'gallery/photography/NCD00038.JPG',
+            'gallery/photography/NCD00047.JPG',
+            'gallery/photography/NCD000367.JPG',
+            'gallery/photography/NCD00403.JPG',
+            'gallery/photography/NCD00444.JPG',
+            'gallery/photography/NCD00446.JPG',
+            'gallery/photography/NCD00451.JPG',
+            'gallery/photography/NCD00454.JPG'
+        ]
+    },
+    'gallery-08': {
+        title: 'Lotus Exhibition',
+        category: 'Lotus',
+        description: 'An experimental combination of photography, painting, and digital manipulation. This series blurs the boundaries between different artistic mediums.',
+        medium: 'Mixed Media',
+        year: '2024',
+        images: [
+            'gallery/lotus/NCD00509.JPG',
+            'gallery/lotus/NCD00510.JPG',
+            'gallery/lotus/NCD00538.JPG',
+            'gallery/lotus/NCD00544.JPG',
+            'gallery/lotus/NCD00601.JPG',
+            'gallery/lotus/NCD00611.JPG',
+            'gallery/lotus/NCD00623.JPG',
+            'gallery/lotus/NCD00628.JPG',
+            'gallery/lotus/NCD00635.JPG',
+            'gallery/lotus/NCD00639.JPG',
+            'gallery/lotus/NCD00645.JPG',
+            'gallery/lotus/NCD00653.JPG',
+            'gallery/lotus/NCD00657.JPG',
+            'gallery/lotus/NCD00658.JPG',
+            'gallery/lotus/NCD00669.JPG',
+            'gallery/lotus/NCD00673.JPG',
+            'gallery/lotus/NCD00683.JPG',
+            'gallery/lotus/NCD00711.JPG',
+            'gallery/lotus/NCD00723.JPG',
+            'gallery/lotus/NCD00747.JPG',
+            'gallery/lotus/NCD00752.JPG',
+            'gallery/lotus/NCD00780.JPG',
+            'gallery/lotus/NCD00787.JPG'
+        ]
+    }
+};
+
+
+        let currentIndex = 0;
+        let images = [];
+        let autoRotateInterval = null;
+        const AUTO_ROTATE_DELAY = 5000; // 5 seconds between auto-rotate
+        const urlParams = new URLSearchParams(window.location.search);
+        const galleryId = urlParams.get('id') || 'gallery-A';
+
+        // Lightbox elements
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImage = document.getElementById('lightbox-image');
+        const lightboxPrev = document.getElementById('lightbox-prev');
+        const lightboxNext = document.getElementById('lightbox-next');
+        const lightboxClose = document.getElementById('lightbox-close');
+
+        function startAutoRotate() {
+            if (autoRotateInterval) clearInterval(autoRotateInterval);
+            autoRotateInterval = setInterval(() => {
+                if (currentIndex < images.length - 1) {
+                    showImage(currentIndex + 1);
+                } else {
+                    showImage(0);
+                }
+            }, AUTO_ROTATE_DELAY);
+        }
+
+        function stopAutoRotate() {
+            if (autoRotateInterval) {
+                clearInterval(autoRotateInterval);
+                autoRotateInterval = null;
+            }
+        }
+
+        function resetAutoRotate() {
+            stopAutoRotate();
+            startAutoRotate();
+        }
+
+        function populateGallery() {
+            const data = galleryData[galleryId];
+            
+            if (data) {
+                images = data.images;
+                
+                document.getElementById('gallery-title').textContent = data.title;
+                document.getElementById('gallery-category').textContent = data.category;
+                document.getElementById('gallery-description').textContent = data.description;
+                document.getElementById('medium').textContent = data.medium;
+                document.getElementById('year').textContent = data.year;
+                document.getElementById('total-count').textContent = images.length;
+                document.getElementById('total-images').textContent = images.length;
+                document.title = `${data.title} - anoaeyto`;
+                
+                const mainImg = document.getElementById('main-image');
+                mainImg.src = images[0];
+                document.getElementById('image-title').textContent = images[0].split('/').pop();
+                
+                // Create thumbnails with placeholders
+                const thumbGrid = document.getElementById('thumbnail-gallery');
+                const gridWidth = 400;
+                const colCount = Math.floor(gridWidth / 90);
+                const rowCount = 2;
+                const totalSlots = colCount * rowCount;
+                
+                const gridItems = [];
+                for (let i = 0; i < totalSlots; i++) {
+                    if (i < images.length) {
+                        gridItems.push(`
+                            <div class="thumbnail-item ${i === 0 ? 'active' : ''}" data-index="${i}">
+                                <img src="${images[i]}" alt="Thumbnail ${i + 1}">
+                            </div>
+                        `);
+                    } else {
+                        gridItems.push('<div class="thumbnail-item empty"></div>');
+                    }
+                }
+                thumbGrid.innerHTML = gridItems.join('');
+                
+                // Thumbnail click handlers
+                document.querySelectorAll('.thumbnail-item:not(.empty)').forEach((thumb, idx) => {
+                    thumb.addEventListener('click', () => showImage(idx));
+                });
+                
+                mainImg.addEventListener('dblclick', () => openLightbox(currentIndex));
+                
+                // Start auto-rotate
+                startAutoRotate();
+            }
+        }
+
+        function showImage(index) {
+            currentIndex = index;
+            const imgSrc = images[currentIndex];
+            const mainImg = document.getElementById('main-image');
+            
+            // Minimal delay for smooth transition
+            setTimeout(() => {
+                mainImg.classList.add('transitioning');
+                
+                setTimeout(() => {
+                    mainImg.src = imgSrc;
+                    document.getElementById('current-index').textContent = currentIndex + 1;
+                    document.getElementById('image-title').textContent = imgSrc.split('/').pop();
+                    
+                    mainImg.classList.remove('transitioning');
+                    
+                    document.querySelectorAll('.thumbnail-item:not(.empty)').forEach((thumb, idx) => {
+                        thumb.classList.toggle('active', idx === currentIndex);
+                    });
+                    
+                    // Reset auto-rotate when manually selecting
+                    resetAutoRotate();
+                }, 250);
+            }, 50);
+        }
+
+        function openLightbox(index) {
+            currentIndex = index;
+            lightboxImage.src = images[currentIndex];
+            lightbox.classList.add('active');
+            document.querySelector('.tech-grid').style.opacity = '0';
+            document.body.style.overflow = 'hidden';
+            stopAutoRotate();
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            document.querySelector('.tech-grid').style.opacity = '0.15';
+            document.body.style.overflow = 'auto';
+            startAutoRotate();
+        }
+
+        lightboxClose.addEventListener('click', closeLightbox);
+        lightboxNext.addEventListener('click', () => {
+            if (currentIndex < images.length - 1) {
+                currentIndex++;
+                lightboxImage.src = images[currentIndex];
+                showImage(currentIndex);
+            }
+        });
+        lightboxPrev.addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                lightboxImage.src = images[currentIndex];
+                showImage(currentIndex);
+            }
+        });
+
+        lightbox.addEventListener('click', (e) => {
+            if (e.target === lightbox) closeLightbox();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (lightbox.classList.contains('active')) {
+                if (e.key === 'ArrowRight' && currentIndex < images.length - 1) {
+                    currentIndex++;
+                    lightboxImage.src = images[currentIndex];
+                    showImage(currentIndex);
+                }
+                if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                    currentIndex--;
+                    lightboxImage.src = images[currentIndex];
+                    showImage(currentIndex);
+                }
+                if (e.key === 'Escape') closeLightbox();
+            }
+        });
+
+        // Chunk-based pixel reveal
+        let firstImageLoaded = false;
+
+        function createPixelReveal() {
+            const canvas = document.getElementById('pixel-reveal-canvas');
+            const img = document.getElementById('main-image');
+            const showcase = document.querySelector('.main-image-area');
+            
+            if (!canvas || !img.complete) return;
+            
+            // Skip animation if already loaded once
+            if (firstImageLoaded) {
+                canvas.style.display = 'none';
+                return;
+            }
+            firstImageLoaded = true;
+            
+            canvas.width = showcase.offsetWidth;
+            canvas.height = showcase.offsetHeight;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            const chunksAcross = 25;
+            const CHUNK = Math.floor(canvas.width / chunksAcross);
+            const cols = chunksAcross;
+            const rows = Math.floor(canvas.height / CHUNK);
+            
+            const chunks = [];
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const cy = r * CHUNK;
+                    const cx = c * CHUNK;
+                    const rowProgress = cy / (rows * CHUNK);
+                    const colStagger = (c / cols) * 0.15;
+                    const rowJitter = ((c * 7 + r * 13) % 11) / 11 * 0.08;
+                    
+                    chunks.push({
+                        cx: cx,
+                        cy: cy,
+                        revealAt: rowProgress + colStagger + rowJitter
+                    });
+                }
+            }
+            
+            chunks.sort((a, b) => a.revealAt - b.revealAt);
+            
+            let startTime = performance.now();
+            canvas.style.opacity = '1';
+            canvas.style.display = 'block';
+            
+            function animate(now) {
+                const elapsed = now - startTime;
+                const TOTAL_TIME = 4000;
+                const progress = Math.min(elapsed / TOTAL_TIME, 1);
+                
+                ctx.fillStyle = '#000';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.fillStyle = 'rgba(0,0,0,1)';
+                
+                chunks.forEach(chunk => {
+                    if (progress >= chunk.revealAt) {
+                        ctx.fillRect(chunk.cx, chunk.cy, CHUNK, CHUNK);
+                    }
+                });
+                
+                ctx.globalCompositeOperation = 'source-over';
+                
+                if (progress < 1) {
+                    requestAnimationFrame(animate);
+                } else {
+                    canvas.style.transition = 'opacity 0.3s ease';
+                    canvas.style.opacity = '0';
+                    setTimeout(() => {
+                        canvas.style.display = 'none';
+                    }, 300);
+                }
+            }
+            
+            requestAnimationFrame(animate);
+        }
+
+        populateGallery();
+    </script>
+</body>
+</html>

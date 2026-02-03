@@ -13,9 +13,10 @@
 <body>
 
 <div class="enter-screen" id="enterScreen">
-    <h1>hello, this is</h1>
-    <p>anoaeyto</p>
-    <button class="enter-button">enter</button>
+    <canvas id="perlinCanvas"></canvas>
+    <canvas id="dustCanvas"></canvas>
+    <h1 class="enter-title" id="enterTitle">anoaeyto</h1>
+    <p class="enter-subtitle" id="enterSubtitle">Creative Technologist</p>
 </div>
 
 <div class="main-content" id="mainContent">
@@ -29,8 +30,8 @@
 
     <nav>
         <a href="#about">About</a>
+        <a href="#gallery">Gallery</a>
         <a href="#projects">Projects</a>
-        <!-- <a href="#gallery">Gallery</a> -->
         <a href="#contact">Contact</a>
         <a href="#cv">CV</a>
     </nav>
@@ -67,61 +68,7 @@
     </div>
 </section>
 
-    <section id="projects">
-        <div class="divider"></div>
-        <h2>PROJECTS</h2>
-        <div class="projects-grid" id="projectsGrid">
-            <a href="project.html?project=unsilent-night" class="project-item">
-                <img src="images/Untitled7.png">
-                <div class="project-info">
-                    <h3>Phil Kline's Unsilent Night</h3>
-                    <div class="project-meta">
-                        <span class="project-type">Installation / Performance</span>
-                        <span class="project-date">December 2024</span>
-                    </div>
-                    <p class="project-description">A participatory sound installation where audiences become part of a moving outdoor sound sculpture.</p>
-                </div>
-            </a>
-            <a href="project.html?project=alt-verse" class="project-item">
-                <img src="images/IMG_6226.JPG">
-                <div class="project-info">
-                    <h3>ALT-VERSE: THE MUSEUM EYEPOOL Interactive Art</h3>
-                    <div class="project-meta">
-                        <span class="project-type">Exhibition / Interactive Art</span>
-                        <span class="project-date">2024</span>
-                    </div>
-                    <p class="project-description">An immersive interactive art installation exploring alternate realities and viewer participation.</p>
-                </div>
-            </a>
-            <a href="project.html?project=tea-club" class="project-item">
-                <img src="images/poster.jpg">
-                <div class="project-info">
-                    <h3>University of Waterloo Tea Club</h3>
-                    <div class="project-meta">
-                        <span class="project-type">Marketing / Branding</span>
-                        <span class="project-date">2023-2024</span>
-                    </div>
-                    <p class="project-description">Visual identity and promotional materials for a campus community organization.</p>
-                </div>
-            </a>
-            <a href="gallery.html" class="project-item">
-                <img src="images/gallery/icey.jpg">
-                <div class="project-info">
-                    <h3>anoaeyto's Playground</h3>
-                    <div class="project-meta">
-                        <span class="project-type">Experimental / Archive</span>
-                        <span class="project-date">Ongoing</span>
-                    </div>
-                    <p class="project-description">A collection of experimental works, creative coding sketches, and digital explorations.</p>
-                </div>
-            </a>
-        </div>
-        <div class="see-more-container" id="seeMoreContainer" style="display: none;">
-            <button class="see-more-btn" id="seeMoreBtn" onclick="toggleProjects()">See More</button>
-        </div>
-    </section>
-
-    <!-- <section id="gallery">
+    <section id="gallery">
         <div class="divider"></div>
         <h2>GALLERY</h2>
         <div class="gallery-grid">
@@ -150,7 +97,33 @@
                 <img src="images/gallery/Untitled8.png">
             </div>
         </div>
-    </section> -->
+    </section>
+
+    <section id="projects">
+        <div class="divider"></div>
+        <h2>PROJECTS</h2>
+        <div class="projects-grid" id="projectsGrid">
+            <div class="project-item" onclick="openModal(0)">
+                <img src="images/Untitled7.png">
+                <h3>Phil Kline's Unsilent Night</h3>
+            </div>
+            <div class="project-item" onclick="openModal(1)">
+                <img src="images/IMG_6226.JPG">
+                <h3>ALT-VERSE: THE MUSEUM EYEPOOL Interactive Art</h3>
+            </div>
+            <div class="project-item" onclick="openModal(2)">
+                <img src="images/poster.jpg">
+                <h3>University of Waterloo Tea Club</h3>
+            </div>
+            <div class="project-item" onclick="openModal(3)">
+                <img src="images/Untitled7.png">
+                <h3>Augmented Reality Exhibition</h3>
+            </div>
+        </div>
+        <div class="see-more-container" id="seeMoreContainer" style="display: none;">
+            <button class="see-more-btn" id="seeMoreBtn" onclick="toggleProjects()">See More</button>
+        </div>
+    </section>
 
     <section id="contact">
         <div class="divider"></div>
@@ -162,7 +135,7 @@
                     <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
                 </svg>
             </a>
-            <a href="/cdn-cgi/l/email-protection#beddd1d0cadfddcafedfd0d1dfdbc7cad1fed9d3dfd7d290ddd1d3">
+            <a href="mailto:contact@anoaeyto@gmail.com">
                 <svg viewBox="0 0 24 24" fill="#fff">
                     <path d="M0 3v18h24v-18h-24zm6.623 7.929l-4.623 5.712v-9.458l4.623 3.746zm-4.141-5.929h19.035l-9.517 7.713-9.518-7.713zm5.694 7.188l3.824 3.099 3.83-3.104 5.612 6.817h-18.779l5.513-6.812zm9.208-1.264l4.616-3.741v9.348l-4.616-5.607z"/>
                 </svg>
@@ -204,4 +177,3 @@
 <script src="script.js"></script>
 </body>
 </html>
-<

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project - anoaeyto</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+        
+        body {
+            background-color: #000;
+            color: #d4d4d4;
+            font-family: 'Eurostile', 'Eurostile Extended', monospace;
+            overflow-x: hidden;
+        }
+
+        .tech-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: 1;
+            pointer-events: none;
+            opacity: 0.08;
+        }
+
+        .version-hud {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 11px;
+            letter-spacing: 1px;
+            color: #00b8a8;
+            z-index: 9997;
+            text-align: right;
+            line-height: 1.6;
+        }
+
+        .coords-hud {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            font-size: 11px;
+            letter-spacing: 1px;
+            color: #00b8a8;
+            z-index: 9997;
+        }
+
+        /* Back button */
+        .back-button {
+            position: fixed;
+            top: 30px;
+            left: 30px;
+            z-index: 100;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #888;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            background: none;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .back-button:hover {
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .back-button::before {
+            content: '← ';
+        }
+
+        /* Hero/Banner */
+        .project-hero {
+            width: 100%;
+            height: 60vh;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 100px;
+        }
+
+        .project-hero img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            filter: brightness(0.7);
+            transition: filter 0.6s ease;
+        }
+
+        .project-hero:hover img {
+            filter: brightness(0.85);
+        }
+
+        /* Title section */
+        .project-title-section {
+            position: relative;
+            z-index: 10;
+            padding: 0 80px 80px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 80px;
+        }
+
+        .project-title-section h1 {
+            font-size: 72px;
+            font-weight: 100;
+            letter-spacing: 4px;
+            margin-bottom: 30px;
+            color: #ffffff;
+        }
+
+        .project-title-section p {
+            font-size: 18px;
+            line-height: 1.8;
+            color: #999;
+            max-width: 800px;
+            margin-bottom: 40px;
+        }
+
+        .project-meta-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 60px;
+        }
+
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .meta-label {
+            font-size: 11px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .meta-value {
+            font-size: 16px;
+            color: #d4d4d4;
+            line-height: 1.6;
+        }
+
+        .meta-value span {
+            display: inline-block;
+            margin-right: 10px;
+            padding: 6px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.02);
+            margin-bottom: 8px;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* Content sections */
+        .project-content {
+            padding: 0 80px 120px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .content-section {
+            margin-bottom: 100px;
+        }
+
+        .content-section h2 {
+            font-size: 48px;
+            font-weight: 100;
+            letter-spacing: 2px;
+            margin-bottom: 40px;
+            color: #ffffff;
+            position: relative;
+            padding-left: 20px;
+        }
+
+        .content-section h2::before {
+            content: '//';
+            position: absolute;
+            left: 0;
+            color: #666;
+            font-size: 42px;
+        }
+
+        .content-section p {
+            font-size: 17px;
+            line-height: 2;
+            color: #999;
+            margin-bottom: 20px;
+            max-width: 900px;
+        }
+
+        .project-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-bottom: 80px;
+        }
+
+        .project-images img {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            object-position: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .project-images img:hover {
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.02);
+            filter: brightness(0.9);
+        }
+
+        /* Tech stack */
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+
+        .tech-badge {
+            padding: 10px 16px;
+            border: 1px solid rgba(0, 200, 150, 0.4);
+            background: rgba(0, 200, 150, 0.05);
+            color: #00b8a8;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        .tech-badge:hover {
+            background: rgba(0, 200, 150, 0.15);
+            border-color: rgba(0, 200, 150, 0.8);
+        }
+
+        /* Progress/Timeline */
+        .project-progress {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 40px;
+            margin-top: 60px;
+        }
+
+        .progress-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .progress-item:last-child {
+            border-bottom: none;
+        }
+
+        .progress-label {
+            font-size: 14px;
+            letter-spacing: 1px;
+            color: #888;
+            text-transform: uppercase;
+        }
+
+        .progress-bar-container {
+            flex: 1;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            margin: 0 30px;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #00b8a8, #00d4c0);
+            border-radius: 2px;
+        }
+
+        .progress-percentage {
+            font-size: 14px;
+            color: #00b8a8;
+            min-width: 50px;
+            text-align: right;
+        }
+
+        /* Navigation */
+        .project-nav {
+            display: flex;
+            justify-content: space-between;
+            padding: 80px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 100px;
+        }
+
+        .project-nav-item {
+            text-decoration: none;
+            color: #888;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+            padding: 10px 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .project-nav-item:hover {
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        footer {
+            padding: 60px 80px;
+            background: #000;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: #666;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+    <div class="tech-grid"></div>
+    
+    <div class="version-hud">
+        v2.1.1<br>
+        STATUS: ONLINE
+    </div>
+    <div class="coords-hud">
+        X: <span id="coord-x">0000</span> Y: <span id="coord-y">0000</span>
+    </div>
+
+    <button class="back-button" onclick="history.back()">Back</button>
+
+    <!-- Project Hero/Banner -->
+    <section class="project-hero">
+        <img src="./projects/IMG_6226.JPG" alt="Project Banner" id="banner-img">
+    </section>
+
+    <!-- Title & Meta -->
+    <section class="project-title-section">
+        <h1 id="project-title">Project Title</h1>
+        <p id="project-description">Project description goes here</p>
+        
+        <div class="project-meta-info">
+            <div class="meta-item">
+                <div class="meta-label">Category</div>
+                <div class="meta-value">
+                    <span id="category">Installation</span>
+                </div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Date</div>
+                <div class="meta-value" id="date">2024</div>
+            </div>
+            <div class="meta-item">
+                <div class="meta-label">Status</div>
+                <div class="meta-value" id="status">Completed</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <section class="project-content">
+        <!-- About Section -->
+        <div class="content-section">
+            <h2>About</h2>
+            <p id="about-text">
+                Add detailed information about the project here. Describe the inspiration, process, challenges, and outcomes. 
+                You can include multiple paragraphs to tell the full story of your project.
+            </p>
+        </div>
+
+        <!-- Tech Stack -->
+        <div class="content-section">
+            <h2>Tech Stack</h2>
+            <div class="tech-stack" id="tech-stack">
+                <div class="tech-badge">TouchDesigner</div>
+                <div class="tech-badge">GLSL</div>
+                <div class="tech-badge">Python</div>
+            </div>
+        </div>
+
+        <!-- Project Images Gallery -->
+        <div class="content-section">
+            <h2>Process & Gallery</h2>
+            <div class="project-images" id="project-gallery">
+                <img src="./projects/IMG_6226.JPG" alt="Process 1">
+                <img src="./projects/poster.jpg" alt="Process 2">
+                <img src="./projects/Untitled7.png" alt="Process 3">
+            </div>
+        </div>
+
+        <!-- Progress -->
+        <div class="content-section">
+            <h2>Development Progress</h2>
+            <div class="project-progress">
+                <div class="progress-item">
+                    <span class="progress-label">Concept & Planning</span>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: 100%"></div>
+                    </div>
+                    <span class="progress-percentage">100%</span>
+                </div>
+                <div class="progress-item">
+                    <span class="progress-label">Design & Prototyping</span>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: 100%"></div>
+                    </div>
+                    <span class="progress-percentage">100%</span>
+                </div>
+                <div class="progress-item">
+                    <span class="progress-label">Development</span>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: 85%"></div>
+                    </div>
+                    <span class="progress-percentage">85%</span>
+                </div>
+                <div class="progress-item">
+                    <span class="progress-label">Testing & Refinement</span>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: 70%"></div>
+                    </div>
+                    <span class="progress-percentage">70%</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Navigation -->
+    <nav class="project-nav">
+        <a href="./portfolio.html#projects" class="project-nav-item">← Back to Projects</a>
+        <a href="./portfolio.html" class="project-nav-item">Home</a>
+    </nav>
+
+    <footer>
+        © 2026 anoaeyto
+    </footer>
+
+    <script>
+        // Track mouse coordinates
+        document.addEventListener('mousemove', (e) => {
+            document.getElementById('coord-x').textContent = String(e.clientX).padStart(4, '0');
+            document.getElementById('coord-y').textContent = String(e.clientY).padStart(4, '0');
+        });
+
+        // Parse URL parameters to populate content
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectId = urlParams.get('id');
+
+        // Sample data - replace with your actual project data
+        const projectData = {
+            'Cosmic Interlude of the Nebular Web': {
+                title: 'Cosmic Interlude of the Nebular Web',
+                description: 'A responsive audiovisual experience exploring galaxy and star formation through interactive digital art. Visitors can manipulate cosmic elements and observe the evolution of stellar structures in real-time.',
+                category: 'Interactive Installation',
+                date: '2025',
+                status: 'Completed',
+                about: 'Built with TouchDesigner and custom shaders to visualize cosmic phenomena through real-time data. This project combines scientific accuracy with artistic interpretation to create an immersive experience that challenges viewers to reconsider their relationship with the cosmos.',
+                tech: ['TouchDesigner', 'Unity', 'Photoshop'],
+                images: ['./projects/IMG_6226.JPG', './projects/poster.jpg'],
+            },
+            'UNIVERSITY OF WATERLOO: TEA CLUB': {
+                title: 'UNIVERSITY OF WATERLOO: TEA CLUB',
+                description: 'Comprehensive brand development, social media management, and website design for the University of Waterloo Tea Club. This project involved creating a cohesive visual identity that reflects the warmth and community of tea culture.',
+                category: 'Brand Development & Digital Design',
+                date: '2024-2025',
+                status: 'Completed',
+                about: 'Developed in Unity with custom particle systems and procedural generation. The game explores quantum concepts through interactive storytelling, allowing players to manipulate reality and observe the consequences of their choices in a branching narrative.',
+                tech: ['Blender', 'Adobe CC Suite', 'HTML/CSS', 'UI/UX Design'],
+                images: ['./projects/poster.jpg', './projects/Untitled7.png'],
+            },
+            'PHIL KLINE'S UNSILENT NIGHT: POLYRHYTHMIC ILLUMINATION': {
+                title: 'PHIL KLINE'S UNSILENT NIGHT: POLYRHYTHMIC ILLUMINATION',
+                description: 'An immersive audiovisual installation exploring the intersection of polyrhythmic music and dynamic lighting. This project reimagines Phil Kline's Unsilent Night through synchronized LED patterns and spatial audio design.',
+                category: 'Audiovisual Installation',
+                date: '2025',
+                status: 'Ongoing',
+                about: 'An exploration of how machine learning can be used as a creative tool. This project combines Python, machine learning, and real-time visualization to generate endless variations of landscape imagery that evolve and adapt.',
+                tech: ['MAX MSP 8', 'Arduino C++', 'Blender'],
+                images: ['./projects/Untitled7.png'],
+            }
+        };
+
+        // Populate page with project data
+        function populateProject() {
+            const data = projectData[projectId];
+            if (data) {
+                document.getElementById('project-title').textContent = data.title;
+                document.getElementById('project-description').textContent = data.description;
+                document.getElementById('category').textContent = data.category;
+                document.getElementById('date').textContent = data.date;
+                document.getElementById('status').textContent = data.status;
+                document.getElementById('about-text').textContent = data.about;
+                
+                // Tech stack
+                const techStack = document.getElementById('tech-stack');
+                techStack.innerHTML = data.tech.map(t => `<div class="tech-badge">${t}</div>`).join('');
+                
+                // Update page title
+                document.title = `${data.title} - anoaeyto`;
+            }
+        }
+
+        populateProject();
+    </script>
+</body>
+</html>
