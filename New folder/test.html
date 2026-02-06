@@ -73,13 +73,13 @@
             opacity: 0.08;
         }
 
-        /* Pixelation overlay for transitions */
+        /* Pixelation overlay for transitions - FIXED TO FILL ENTIRE SCREEN */
         .pixelation-overlay {
             position: fixed;
             top: 0;
             left: 0;
-            width: 125vh;
-            height: 125vh;
+            width: 100vw;
+            height: 100vh;
             pointer-events: none;
             z-index: 10000;
             opacity: 0;
@@ -284,7 +284,10 @@
             overflow: hidden;
             z-index: -1;
             pointer-events: none;
-            opacity: ;
+            opacity: 0;
+        }
+
+        .hero-image-container.fade-in {
             animation: imageAppear 3.3s ease-in-out forwards;
             animation-delay: 1.2s;
         }
@@ -350,7 +353,7 @@
             z-index: 100;
             display: flex;
             justify-content: center;
-            gap: 60px;
+            gap: 40px;
             padding: 25px 0;
             background: rgba(0, 0, 0, 0.95);
             backdrop-filter: blur(20px);
@@ -369,6 +372,60 @@
             width: 300px;
             height: 1px;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        }
+
+        .nav-logo {
+            position: absolute;
+            left: 80px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #888;
+            font-weight: 100;
+            cursor: pointer;
+            padding: 4px 8px;
+            border: 1px solid transparent;
+            transition: color 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+        }
+
+        .nav-logo::before {
+            content: '[';
+            margin-right: 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-logo::after {
+            content: ']';
+            margin-left: 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .nav-logo:hover {
+            color: #ffffff;
+            border-color: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .nav-logo:hover::before,
+        .nav-logo:hover::after {
+            opacity: 1;
+        }
+
+        .nav-logo span:hover {
+            color: inherit;
+        }
+
+        .nav-logo span {
+            display: inline-block;
+            transition: color 0.15s ease;
+        }
+
+        .nav-logo span.cyan {
+            color: #00b8a8;
         }
 
         .nav a {
@@ -444,10 +501,10 @@
             right: 80px;
             font-size: 11px;
             letter-spacing: 2px;
-            color: #333;
+            color: #888;
         }
         
-        /* Image wrapper — fixed effect that completes on first scroll into view */
+        /* Image wrapper — geometric pixel reveal */
         .about-image-wrapper {
             width: 25%;
             height: 60vh;
@@ -465,9 +522,8 @@
             object-fit: cover;
             object-position: center 30%;
             display: block;
-            filter: saturate(1.2) brightness(0.8);
+            filter: saturate(1.2) brightness(0.9);
             transition: filter 1.4s cubic-bezier(0.22, 1, 0.36, 1) 0.4s;
-            /* Apply screen blend mode like anoaeyto text */
             mix-blend-mode: screen;
             text-shadow: 
                 2px 2px 0 rgba(255, 0, 0, 0.05),
@@ -478,14 +534,6 @@
             filter: saturate(1.3) brightness(0.9);
         }
 
-        /* Pixel glitch blocks at bottom for aesthetic - jagged cutoff */
-        .about-image-wrapper::after {
-            display: none;
-        }
-
-        .about.visible .about-image-wrapper img {
-            filter: saturate(1.3) brightness(0.9);
-        }
         .about-image-wrapper canvas {
             position: absolute;
             top: 0;
@@ -634,7 +682,7 @@
             right: 80px;
             font-size: 11px;
             letter-spacing: 2px;
-            color: #333;
+            color: #888;
         }
         
         .projects-header {
@@ -665,14 +713,14 @@
         }
         
         .project-card {
-            position: relative;
-            min-height: 70vh;
-            overflow: hidden;
-            cursor: pointer;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-            display: flex;
-            flex-direction: column;
-            background: rgba(255, 255, 255, 0.01);
+              position: relative;
+    min-height: 70vh;
+    overflow: hidden;
+    cursor: default;  /* CHANGE from cursor: pointer; to cursor: default; */
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    background: rgba(255, 255, 255, 0.01);
         }
 
         .project-card::before {
@@ -712,7 +760,7 @@
             width: 100%;
             height: 100%;
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transition: left 0.8s ease;
+            transition: left 0.5s ease;
         }
 
         .project-card:hover .project-image::after {
@@ -720,12 +768,12 @@
         }
 
         .project-card.visible .project-image {
-            animation: slideInFromLeft 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            animation: slideInFromLeft 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
 
-        .project-card:nth-child(1).visible .project-image { animation-delay: 0.2s; }
-        .project-card:nth-child(2).visible .project-image { animation-delay: 0.4s; }
-        .project-card:nth-child(3).visible .project-image { animation-delay: 0.6s; }
+        .project-card:nth-child(1).visible .project-image { animation-delay: 0.1s; }
+        .project-card:nth-child(2).visible .project-image { animation-delay: 0.2s; }
+        .project-card:nth-child(3).visible .project-image { animation-delay: 0.3s; }
 
         .project-image img {
             width: 100%;
@@ -733,7 +781,7 @@
             object-fit: cover;
             object-position: center;
             filter: brightness(0.8) saturate(1.2);
-            transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), filter 0.6s ease;
+            transition: transform 1.6s cubic-bezier(0.22, 1, 0.36, 1), filter 0.6s ease;
         }
 
         .project-card:hover .project-image img {
@@ -848,7 +896,7 @@
             width: 100%;
             height: 100%;
             background: #00b8a8;
-            transition: left 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+            transition: left 0.9s cubic-bezier(0.22, 1, 0.36, 1);
             z-index: -1;
         }
 
@@ -864,29 +912,23 @@
         /* Gallery Section */
         .gallery {
             width: 100%;
-            padding: 120px 80px 80px;
+            padding: 0px 80px 80px;
             background-color: #000;
             position: relative;
         }
 
         .gallery::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 1px;
-            background: linear-gradient(to right, transparent, rgba(255,255,255,0.15), transparent);
+           
         }
 
         .gallery::after {
             content: 'SECTION_03';
             position: absolute;
-            top: 20px;
+            top: -80px;
             right: 80px;
             font-size: 11px;
             letter-spacing: 2px;
-            color: #333;
+            color: #888;
         }
         
         .gallery h2 {
@@ -922,6 +964,11 @@
             pointer-events: auto;
             cursor: pointer;
             transition: opacity 0.8s ease-in-out, outline 0.2s ease;
+        }
+
+        .gallery-item.transition-active {
+            pointer-events: none !important;
+            cursor: default !important;
         }
 
         .gallery-item img {
@@ -1041,7 +1088,7 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: #fff;
+            background: rgba(0, 0, 0, 0);
             transition: left 0.4s cubic-bezier(0.22, 1, 0.36, 1);
             z-index: -1;
         }
@@ -1051,9 +1098,14 @@
         }
         
         .cta-button:hover {
-            color: #000;
-            border-color: #fff;
+            color: #00b8a8;
+            border-color: #00b8a8;
         }
+
+        .cta-button:active {
+    background: rgba(0, 184, 168, 0.2);
+    border-color: #00b8a8;
+}
 
         footer {
             padding: 60px 80px;
@@ -1079,10 +1131,30 @@
             letter-spacing: 2px;
             text-transform: uppercase;
             transition: color 0.3s ease;
+            position: relative;
+        }
+
+        .footer-links a::before {
+            content: '[';
+            margin-right: 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-links a::after {
+            content: ']';
+            margin-left: 4px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .footer-links a:hover {
             color: #aaa;
+        }
+
+        .footer-links a:hover::before,
+        .footer-links a:hover::after {
+            opacity: 1;
         }
 
         .footer-copy {
@@ -1222,8 +1294,8 @@
         <div id="background"></div>
         <div class="pixel-particles" id="pixel-particles"></div>
         <div class="hero-text">
-            <div class="hero-image-container">
-                <img src="./new.png" alt="Hero Background">
+            <div class="hero-image-container fade-in" id="hero-image-container">
+                <img src="./new.png" alt="Hero Background" id="hero-image">
             </div>
             <h1>anoaeyto</h1>
             <p>designer / developer / storyteller</p>
@@ -1236,6 +1308,7 @@
 
     <!-- Nav -->
     <nav class="nav">
+        <div class="nav-logo" id="nav-logo">ANOAEYTO</div>
         <a href="#about">About</a>
         <a href="#projects">Projects</a>
         <a href="#gallery">Gallery</a>
@@ -1371,8 +1444,7 @@
         <h2>Get In Touch</h2>
         <div class="cta-buttons">
             <button class="cta-button">Download CV</button>
-            <button class="cta-button">Contact Me</button>
-        </div>
+            <button class="cta-button" onclick="window.open('mailto:your@email.com', '_self'); return false;">Contact Me</button>
     </section>
 
     <footer>
@@ -1390,13 +1462,73 @@
 
     <script>
     // ============================================================
+    // NAV LOGO ANIMATION - Wave effect with one cyan character at a time
+    // ============================================================
+    (function() {
+        const logoEl = document.getElementById('nav-logo');
+        const originalText = 'ANOAEYTO';
+        
+        // Split text into individual characters wrapped in spans
+        logoEl.innerHTML = originalText.split('').map(char => 
+            `<span>${char}</span>`
+        ).join('');
+        
+        const chars = logoEl.querySelectorAll('span');
+        let isAnimating = false;
+        
+        function animateLogo() {
+            if (isAnimating) return;
+            isAnimating = true;
+            
+            let currentChar = 0;
+            
+            const charInterval = setInterval(() => {
+                if (currentChar < chars.length) {
+                    if (currentChar > 0) {
+                        chars[currentChar - 1].classList.remove('cyan');
+                    }
+                    chars[currentChar].classList.add('cyan');
+                    currentChar++;
+                } else {
+                    chars[chars.length - 1].classList.remove('cyan');
+                    clearInterval(charInterval);
+                    isAnimating = false;
+                    setTimeout(animateLogo, 3000);
+                }
+            }, 150);
+        }
+        
+        setTimeout(animateLogo, 2000);
+
+        // Click handler to reload the page
+        logoEl.addEventListener('click', () => {
+            window.location.reload();
+        });
+    })();
+
+
+// ============================================================
+// SCROLL RESTORATION - Always start at top on page load/refresh
+// ============================================================
+(function() {
+    // Only run on fresh page loads, not on same-page interactions
+    if (performance.navigation.type === performance.navigation.TYPE_RELOAD || 
+        performance.navigation.type === performance.navigation.TYPE_NAVIGATE) {
+        window.scrollTo(0, 0);
+    }
+    
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+    }
+})();
+
+    // ============================================================
     // COPYRIGHT TEXT ANIMATION - Wave effect with one cyan character at a time
     // ============================================================
     (function() {
         const copyrightEl = document.getElementById('copyright-text');
         const originalText = '© 2026 anoaeyto';
         
-        // Split text into individual characters wrapped in spans
         copyrightEl.innerHTML = originalText.split('').map(char => 
             `<span>${char}</span>`
         ).join('');
@@ -1410,198 +1542,131 @@
             
             let currentChar = 0;
             
-            // Animate each character sequentially - only one cyan at a time
             const charInterval = setInterval(() => {
                 if (currentChar < chars.length) {
-                    // Remove cyan from previous character
                     if (currentChar > 0) {
                         chars[currentChar - 1].classList.remove('cyan');
                     }
-                    // Add cyan to current character
                     chars[currentChar].classList.add('cyan');
                     currentChar++;
                 } else {
-                    // Remove cyan from last character
                     chars[chars.length - 1].classList.remove('cyan');
                     clearInterval(charInterval);
                     isAnimating = false;
-                    
-                    // Wait 3 seconds before starting again
                     setTimeout(animateCopyright, 3000);
                 }
-            }, 150); // 150ms delay between each character
+            }, 150);
         }
         
-        // Start the animation after page loads
         setTimeout(animateCopyright, 2000);
     })();
 
-    // ABOUT IMAGE — square-chunk reveal from TOP TO BOTTOM (smooth)
+    // ============================================================
+    // HERO IMAGE - Static first load, then fade-in on scroll
     // ============================================================
     (function() {
-        const wrapper   = document.getElementById('about-image-wrapper');
-        const canvas    = document.getElementById('about-reveal-canvas');
-        const ctx       = canvas.getContext('2d');
-        let CHUNK       = 100;  // Will be calculated based on width
-        let chunks      = [];          // { cx, cy, revealAt }
-        let initialized = false;
-        let hasRevealed = false;
-
-        function init() {
-            const rect = wrapper.getBoundingClientRect();
-            canvas.width  = rect.width;
-            canvas.height = rect.height;
-            
-            // Define the number of chunks you want across the width (e.g., 8 chunks = perfectly square)
-            const chunksAcross = 12;  // Change this number to subdivide differently (e.g., 4, 6, 10, 12)
-            
-            // Calculate chunk size to divide width evenly
-            CHUNK = Math.floor(rect.width / chunksAcross);
-
-            const cols = chunksAcross;  
-            const rows = Math.floor(rect.height / CHUNK)
-            chunks = [];
-
-            // Create chunks sorted by Y position with staggered horizontal reveal
-            const tempChunks = [];
-            for (let r = 0; r < rows; r++) {
-                for (let c = 0; c < cols; c++) {
-                    const cy = r * CHUNK;
-                    const cx = c * CHUNK;
-                    
-                    // Primary reveal is by row (Y position)
-                    const rowProgress = cy / (rows * CHUNK);
-                    
-                    // Add horizontal stagger within each row - creates a wave effect
-                    const colStagger = (c / cols) * 0.15;  // Columns reveal slightly offset
-                    const rowJitter = ((c * 7 + r * 13) % 11) / 11 * 0.08;
-                    
-                    tempChunks.push({
-                        cx: cx,
-                        cy: cy,
-                        revealAt: rowProgress + colStagger + rowJitter
-                    });
-                }
-            }
-            
-            // Sort by revealAt time for smooth top-to-bottom flow
-            chunks = tempChunks.sort((a, b) => a.revealAt - b.revealAt);
-
-            // Start fully black
-            ctx.fillStyle = '#000';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            initialized = true;
+        const heroImageContainer = document.getElementById('hero-image-container');
+        const heroImage = document.getElementById('hero-image');
+        let hasScrolled = false;
+        
+        // Show image immediately on load
+        heroImage.addEventListener('load', function() {
+            heroImageContainer.classList.add('visible');
+        });
+        
+        // If already cached
+        if (heroImage.complete) {
+            heroImageContainer.classList.add('visible');
         }
-
-        function draw(progress) {
-            ctx.fillStyle = '#000';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-            ctx.globalCompositeOperation = 'destination-out';
-            ctx.fillStyle = 'rgba(0,0,0,1)';
-            
-            for (let i = 0; i < chunks.length; i++) {
-                if (progress >= chunks[i].revealAt) {
-                    ctx.fillRect(chunks[i].cx, chunks[i].cy, CHUNK, CHUNK);
-                }
+        
+        // Watch for scroll
+        window.addEventListener('scroll', function() {
+            if (!hasScrolled && window.scrollY > 50) {
+                hasScrolled = true;
+                // Fade out
+                heroImageContainer.style.transition = 'opacity 0.5s ease';
+                heroImageContainer.style.opacity = '0';
+                
+                setTimeout(() => {
+                    // Switch to fade-in mode
+                    heroImageContainer.classList.remove('first-load', 'visible');
+                    heroImageContainer.classList.add('fade-in');
+                    heroImageContainer.style.transition = '';
+                    heroImageContainer.style.opacity = '';
+                }, 500);
             }
-            ctx.globalCompositeOperation = 'source-over';
-        }
-
-        function onScroll() {
-            const rect  = wrapper.getBoundingClientRect();
-            const viewH = window.innerHeight;
-            
-            // Slower, more gradual reveal
-            const enterAt = viewH;
-            const endAt   = viewH * 0.35;  // Increased from 0.25 for smoother feel
-            let progress = Math.max(0, Math.min(1,
-                (enterAt - rect.top) / (enterAt - endAt)
-            ));
-            
-            // Cap progress at 0.8 so bottom squares never fully load
-            progress = Math.min(progress, 0.8);
-
-            if (!initialized) init();
-            
-            if (progress < 0.8) {
-                draw(progress);
-            } else if (!hasRevealed) {
-                // When at max, freeze at 80% - don't clear canvas
-                draw(0.8);
-                hasRevealed = true;
-            }
-        }
-
-        window.addEventListener('scroll', onScroll, { passive: true });
-        onScroll();
+        }, { passive: true });
     })();
 
     // ============================================================
-    // GALLERY IMAGE LOADING & GEOMETRIC DISSOLVE TRANSITION
+    // ABOUT IMAGE — Geometric pixel reveal with image preload
     // ============================================================
     (function() {
-        const galleryItems = document.querySelectorAll('.gallery-item');
-        const pixelCanvas = document.getElementById('pixelation-canvas');
-        const pixelCtx = pixelCanvas.getContext('2d');
+        const wrapper = document.getElementById('about-image-wrapper');
+        const canvas = document.getElementById('about-reveal-canvas');
+        const img = document.getElementById('about-img');
+        const ctx = canvas.getContext('2d');
+        let initialized = false;
+        let hasRevealed = false;
+        let imageLoaded = false;
+        let animationFrameId = null;
 
-        // Apply custom focus positions to images
-        galleryItems.forEach((item) => {
-            const img = item.querySelector('img');
-            const focusPosition = item.getAttribute('data-focus') || 'center center';
-            img.style.objectPosition = focusPosition;
-        });
-
-        // Wait for 5th item's animation to complete before enabling hover
-        const fifthItem = galleryItems[4]; // 0-indexed, so 5th item is index 4
-        
-        if (fifthItem) {
-            fifthItem.addEventListener('transitionend', function handler(e) {
-                // Only trigger on opacity transition (the main fade-in)
-                if (e.propertyName === 'opacity') {
-                    // Enable hover on all items
-                    galleryItems.forEach((item) => {
-                        item.classList.add('loaded');
+        // Wait for image to fully load
+        function ensureImageLoaded() {
+            return new Promise((resolve) => {
+                if (img.complete && img.naturalHeight !== 0) {
+                    imageLoaded = true;
+                    resolve();
+                } else {
+                    img.addEventListener('load', () => {
+                        imageLoaded = true;
+                        resolve();
                     });
-                    // Remove listener after it fires once
-                    fifthItem.removeEventListener('transitionend', handler);
+                    img.addEventListener('error', () => {
+                        console.error('Failed to load about image');
+                        resolve(); // Resolve anyway to prevent blocking
+                    });
                 }
             });
         }
-        
-        // Set canvas to full window size
-        function resizePixelCanvas() {
-            pixelCanvas.width = window.innerWidth;
-            pixelCanvas.height = window.innerHeight;
+
+        function init() {
+            const rect = wrapper.getBoundingClientRect();
+            canvas.width = rect.width;
+            canvas.height = rect.height;
+            
+            // Fill entire canvas with solid black - no gaps
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Double-check by drawing black squares over entire grid
+            const ps = 16;
+            const cols = Math.ceil(canvas.width / ps);
+            const rows = Math.ceil(canvas.height / ps);
+            
+            for (let y = 0; y < rows; y++) {
+                for (let x = 0; x < cols; x++) {
+                    ctx.fillRect(x * ps, y * ps, ps, ps);
+                }
+            }
+            
+            initialized = true;
         }
-        resizePixelCanvas();
-        window.addEventListener('resize', resizePixelCanvas);
 
-        galleryItems.forEach((item) => {
-            item.addEventListener('click', function() {
-                if (!this.classList.contains('loaded')) return;
-                
-                const rect = this.getBoundingClientRect();
-                const label = this.querySelector('.gallery-item-label').textContent;
-                
-                // Start geometric dissolve transition
-                triggerPixelationTransition(rect, () => {
-                    window.location.href = `./gallery.html?id=gallery-${label}`;
-                });
-            });
-        });
+        async function triggerReveal() {
+            if (hasRevealed) return;
+            hasRevealed = true;
 
-        // ============================================================
-        // Organic Radial Gradient Transition with Jagged Edges
-        // ============================================================
-        function triggerPixelationTransition(startRect, callback) {
-            pixelCanvas.classList.add('active');
+            // Ensure image is fully loaded before starting reveal
+            await ensureImageLoaded();
             
-            const ps = 8; // pixel size
-            const cols = Math.ceil(pixelCanvas.width / ps) + 1;
-            const rows = Math.ceil(pixelCanvas.height / ps) + 1;
+            // Extra verification: wait a frame to ensure image is rendered
+            await new Promise(resolve => requestAnimationFrame(resolve));
+
+            const ps = 16; // pixel size
+            const cols = Math.ceil(canvas.width / ps);
+            const rows = Math.ceil(canvas.height / ps);
             
-            // Always start from center of screen for consistent effect
             const cx = Math.floor(cols / 2);
             const cy = Math.floor(rows / 2);
             
@@ -1611,42 +1676,34 @@
             function k(x, y) { return x + ',' + y; }
             function inB(x, y) { return x >= 0 && x < cols && y >= 0 && y < rows; }
             
-            // Calculate distance from center for gradient
             function getDistance(gx, gy) {
                 const dx = gx - cx;
                 const dy = gy - cy;
                 return Math.sqrt(dx * dx + dy * dy);
             }
             
-            // Max distance to corners
-            const maxDist = Math.sqrt(cx * cx + cy * cy);
+            function draw(gx, gy) {
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.fillStyle = 'rgba(0,0,0,1)';
+                ctx.fillRect(gx * ps, gy * ps, ps, ps);
+                ctx.globalCompositeOperation = 'source-over';
+            }
             
-            function draw(gx, gy, distFromCenter) {
-    const palette = [
-        [0, 184, 168],   // cyan
-        [220, 80, 30],   // orange
-        [100, 160, 60]   // green
-    ];
-
-    const [r, g, b] = palette[Math.floor(Math.random() * palette.length)];
-
-    pixelCtx.fillStyle = `rgba(${r}, ${g}, ${b}, 0.6)`;
-    pixelCtx.fillRect(gx * ps, gy * ps, ps, ps);
-}
-
-            
-            // Seed center point
             visited.add(k(cx, cy));
             frontier.push({ gx: cx, gy: cy, dist: 0 });
             
             const startTime = performance.now();
-            const TOTAL_TIME = 1200;
+            const TOTAL_TIME = 3500; // Slower: 3.5 seconds instead of 2.2
             
             function animate(now) {
+                const elapsed = now - startTime;
+                const progress = Math.min(elapsed / TOTAL_TIME, 1);
                 
-                const progress = Math.min((now - startTime) / TOTAL_TIME, 1);
-                const budget = Math.floor((30 + progress * 220) * 10); // Higher multiplier to reach corners
-                const fireChance = 0.2 + progress * 0.7; // 0.2→0.9 - brings back randomness
+                // Gentler budget that scales more gradually
+                const budget = Math.floor((40 + progress * 350) * 12);
+                
+                // Smoother fire chance - start lower, end at 95%
+                const fireChance = 0.5 + progress * 0.45;
                 
                 let fired = 0;
                 const keep = [];
@@ -1658,13 +1715,11 @@
                         continue;
                     }
                     
-                    // Random firing creates jagged edges
                     if (Math.random() < fireChance) {
                         const { gx, gy, dist } = frontier[i];
                         draw(gx, gy, dist);
                         fired++;
                         
-                        // Add all 4 cardinal neighbors
                         const neighbors = [
                             { dx: 0, dy: -1 },
                             { dx: 1, dy: 0 },
@@ -1684,7 +1739,218 @@
                             }
                         });
                         
-                        // Sometimes add diagonals for more organic spread
+                        // Add diagonals after 30% progress or if frontier is small
+                        if (progress > 0.3 || frontier.length < 50) {
+                            const diagonals = [
+                                { dx: 1, dy: 1 }, { dx: -1, dy: 1 },
+                                { dx: 1, dy: -1 }, { dx: -1, dy: -1 }
+                            ];
+                            diagonals.forEach(({ dx, dy }) => {
+                                const nx = gx + dx;
+                                const ny = gy + dy;
+                                const nk = k(nx, ny);
+                                
+                                if (inB(nx, ny) && !visited.has(nk)) {
+                                    visited.add(nk);
+                                    const newDist = getDistance(nx, ny);
+                                    spawn.push({ gx: nx, gy: ny, dist: newDist });
+                                }
+                            });
+                        }
+                    } else {
+                        keep.push(frontier[i]);
+                    }
+                }
+                
+                frontier = keep.concat(spawn);
+                
+                const totalSquares = cols * rows;
+                const fillPercentage = visited.size / totalSquares;
+                
+                // Continue until 99% revealed OR exceeded time + buffer
+                if (fillPercentage < 0.99 && elapsed < TOTAL_TIME + 1500) {
+                    animationFrameId = requestAnimationFrame(animate);
+                } else {
+                    // Force reveal ALL remaining squares
+                    console.log(`Completing reveal: ${(fillPercentage * 100).toFixed(1)}% done, forcing remaining squares`);
+                    
+                    // First pass: reveal any unvisited squares
+                    for (let y = 0; y < rows; y++) {
+                        for (let x = 0; x < cols; x++) {
+                            if (!visited.has(k(x, y))) {
+                                draw(x, y);
+                            }
+                        }
+                    }
+                    
+                    // Second pass: verify entire canvas is cleared (safety net)
+                    ctx.globalCompositeOperation = 'destination-out';
+                    ctx.fillStyle = 'rgba(0,0,0,1)';
+                    for (let y = 0; y < rows; y++) {
+                        for (let x = 0; x < cols; x++) {
+                            ctx.fillRect(x * ps, y * ps, ps, ps);
+                        }
+                    }
+                    ctx.globalCompositeOperation = 'source-over';
+                    
+                    console.log('Reveal complete - all squares cleared');
+                }
+            }
+            
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
+        function onScroll() {
+            const rect = wrapper.getBoundingClientRect();
+            const viewH = window.innerHeight;
+            
+            // Initialize canvas as soon as the section exists
+            if (!initialized) init();
+            
+            // Trigger reveal when section becomes visible
+            if (rect.top < viewH * 0.8 && !hasRevealed) {
+                triggerReveal();
+            }
+        }
+
+        // Initialize immediately to ensure black squares cover the image from the start
+        window.addEventListener('load', () => {
+            if (!initialized) init();
+        });
+        
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+    })();
+
+    // ============================================================
+    // GALLERY IMAGE LOADING & GEOMETRIC DISSOLVE TRANSITION
+    // ============================================================
+    (function() {
+        const galleryItems = document.querySelectorAll('.gallery-item');
+        const pixelCanvas = document.getElementById('pixelation-canvas');
+        const pixelCtx = pixelCanvas.getContext('2d');
+
+        galleryItems.forEach((item) => {
+            const img = item.querySelector('img');
+            const focusPosition = item.getAttribute('data-focus') || 'center center';
+            img.style.objectPosition = focusPosition;
+        });
+
+        const fifthItem = galleryItems[4];
+        
+        if (fifthItem) {
+            fifthItem.addEventListener('transitionend', function handler(e) {
+                if (e.propertyName === 'opacity') {
+                    galleryItems.forEach((item) => {
+                        item.classList.add('loaded');
+                    });
+                    fifthItem.removeEventListener('transitionend', handler);
+                }
+            });
+        }
+        
+        function resizePixelCanvas() {
+            pixelCanvas.width = window.innerWidth;
+            pixelCanvas.height = window.innerHeight;
+        }
+        resizePixelCanvas();
+        window.addEventListener('resize', resizePixelCanvas);
+
+        galleryItems.forEach((item) => {
+            item.addEventListener('click', function() {
+                if (!this.classList.contains('loaded')) return;
+                
+                const rect = this.getBoundingClientRect();
+                const label = this.querySelector('.gallery-item-label').textContent;
+                
+                // Disable all gallery items during transition
+                galleryItems.forEach(gi => gi.classList.add('transition-active'));
+                
+                triggerPixelationTransition(rect, () => {
+                    window.location.href = `./gallery.html?id=gallery-${label}`;
+                });
+            });
+        });
+
+        function triggerPixelationTransition(startRect, callback) {
+            pixelCanvas.classList.add('active');
+            
+            const ps = 16;
+            const cols = Math.ceil(pixelCanvas.width / ps) + 1;
+            const rows = Math.ceil(pixelCanvas.height / ps) + 1;
+            
+            const cx = Math.floor(cols / 2);
+            const cy = Math.floor(rows / 2);
+            
+            const visited = new Set();
+            let frontier = [];
+            
+            function k(x, y) { return x + ',' + y; }
+            function inB(x, y) { return x >= 0 && x < cols && y >= 0 && y < rows; }
+            
+            function getDistance(gx, gy) {
+                const dx = gx - cx;
+                const dy = gy - cy;
+                return Math.sqrt(dx * dx + dy * dy);
+            }
+            
+            function draw(gx, gy, distFromCenter) {
+                const palette = [
+                    [0, 184, 168],
+                    [220, 80, 30],
+                    [100, 160, 60]
+                ];
+
+                const [r, g, b] = palette[Math.floor(Math.random() * palette.length)];
+                pixelCtx.fillStyle = `rgba(${r}, ${g}, ${b}, 1)`;
+                pixelCtx.fillRect(gx * ps, gy * ps, ps, ps);
+            }
+            
+            visited.add(k(cx, cy));
+            frontier.push({ gx: cx, gy: cy, dist: 0 });
+            
+            const startTime = performance.now();
+            const TOTAL_TIME = 1200;
+            
+            function animate(now) {
+                const progress = Math.min((now - startTime) / TOTAL_TIME, 1);
+                const budget = Math.floor((30 + progress * 220) * 10);
+                const fireChance = 0.2 + progress * 0.7;
+                
+                let fired = 0;
+                const keep = [];
+                const spawn = [];
+                
+                for (let i = 0; i < frontier.length; i++) {
+                    if (fired >= budget) {
+                        keep.push(frontier[i]);
+                        continue;
+                    }
+                    
+                    if (Math.random() < fireChance) {
+                        const { gx, gy, dist } = frontier[i];
+                        draw(gx, gy, dist);
+                        fired++;
+                        
+                        const neighbors = [
+                            { dx: 0, dy: -1 },
+                            { dx: 1, dy: 0 },
+                            { dx: 0, dy: 1 },
+                            { dx: -1, dy: 0 }
+                        ];
+                        
+                        neighbors.forEach(({ dx, dy }) => {
+                            const nx = gx + dx;
+                            const ny = gy + dy;
+                            const nk = k(nx, ny);
+                            
+                            if (inB(nx, ny) && !visited.has(nk)) {
+                                visited.add(nk);
+                                const newDist = getDistance(nx, ny);
+                                spawn.push({ gx: nx, gy: ny, dist: newDist });
+                            }
+                        });
+                        
                         if (Math.random() > 0.5) {
                             const diagonals = [
                                 { dx: 1, dy: 1 }, { dx: -1, dy: 1 },
@@ -1708,7 +1974,6 @@
                 
                 frontier = keep.concat(spawn);
                 
-                // Continue until screen is filled
                 const fillPercentage = visited.size / (cols * rows);
                 
                 if (fillPercentage < 1) {
@@ -1729,7 +1994,7 @@
     // ============================================================
     document.querySelectorAll('.gallery-item').forEach((item, idx) => {
         item.addEventListener('mouseenter', () => {
-            if (!item.classList.contains('loaded')) return;
+            if (!item.classList.contains('loaded') || item.classList.contains('transition-active')) return;
             
             document.querySelectorAll('.gallery-item').forEach(other => {
                 if (other !== item) {
@@ -1741,7 +2006,7 @@
         });
         
         item.addEventListener('mouseleave', () => {
-            if (!item.classList.contains('loaded')) return;
+            if (!item.classList.contains('loaded') || item.classList.contains('transition-active')) return;
             
             document.querySelectorAll('.gallery-item').forEach(other => {
                 other.style.opacity = '1';
@@ -1805,12 +2070,31 @@
             const sizeClass = ['small', 'medium', 'large'][Math.floor(Math.random() * 3)];
             if (sizeClass) pixel.classList.add(sizeClass);
             pixel.style.left = Math.random() * 100 + '%';
+            pixel.style.opacity = '0';
             pixel.style.animationDuration = (15 + Math.random() * 20) + 's';
-            pixel.style.animationDelay   = (Math.random() * 10) + 's';
+            pixel.style.animationDelay = (Math.random() * 10) + 's';
             pixel.style.setProperty('--drift', ((Math.random() - 0.5) * 200) + 'px');
             container.appendChild(pixel);
         }
     })();
+
+
+    // ============================================================
+    // 
+    // ============================================================
+(function preloadProjectImages() {
+    const imageSources = [
+        './projects/IMG_6226.JPG',
+        './projects/poster.jpg',
+        './projects/Untitled7.png'
+    ];
+    
+    imageSources.forEach(src => {
+        const img = new Image();
+        img.src = src;
+    });
+})();
+
     </script>
 </body>
 </html>

@@ -206,15 +206,19 @@
             flex-direction: column;
             padding: 80px 40px;
             overflow-y: auto;
+            overflow-x: hidden;
             gap: 30px;
+            max-width: 100%;
         }
 
         .gallery-info h2 {
-            font-size: 36px;
+            font-size: 32px;
             font-weight: 100;
             letter-spacing: 2px;
             color: #ffffff;
             line-height: 1.4;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .info-label {
@@ -374,6 +378,15 @@
             z-index: 9;
         }
 
+        footer span {
+            display: inline-block;
+            transition: color 0.15s ease;
+        }
+
+        footer span.cyan {
+            color: #00b8a8;
+        }
+
         /* Scrollbar styling */
         .gallery-info::-webkit-scrollbar,
         .thumbnail-section::-webkit-scrollbar {
@@ -491,11 +504,50 @@
         </div>
     </div>
 
-    <footer>
+    <footer id="copyright-text">
         © 2026 anoaeyto
     </footer>
 
     <script>
+        // ============================================================
+        // COPYRIGHT TEXT ANIMATION - Wave effect with one cyan character at a time
+        // ============================================================
+        (function() {
+            const copyrightEl = document.getElementById('copyright-text');
+            const originalText = '© 2026 anoaeyto';
+            
+            copyrightEl.innerHTML = originalText.split('').map(char => 
+                `<span>${char}</span>`
+            ).join('');
+            
+            const chars = copyrightEl.querySelectorAll('span');
+            let isAnimating = false;
+            
+            function animateCopyright() {
+                if (isAnimating) return;
+                isAnimating = true;
+                
+                let currentChar = 0;
+                
+                const charInterval = setInterval(() => {
+                    if (currentChar < chars.length) {
+                        if (currentChar > 0) {
+                            chars[currentChar - 1].classList.remove('cyan');
+                        }
+                        chars[currentChar].classList.add('cyan');
+                        currentChar++;
+                    } else {
+                        chars[chars.length - 1].classList.remove('cyan');
+                        clearInterval(charInterval);
+                        isAnimating = false;
+                        setTimeout(animateCopyright, 3000);
+                    }
+                }, 150);
+            }
+            
+            setTimeout(animateCopyright, 2000);
+        })();
+
         // Track mouse coordinates
         document.addEventListener('mousemove', (e) => {
             document.getElementById('coord-x').textContent = String(e.clientX).padStart(4, '0');
@@ -550,7 +602,7 @@
         ]
     },
     'gallery-05': {
-        title: 'Environmental Design',
+        title: 'Environment Design',
         category: 'Environment',
         description: 'A collection of environmental design concepts and landscape studies exploring different lighting conditions and atmospheric effects.',
         medium: 'Digital Painting',
@@ -803,7 +855,7 @@
             }
         });
 
-        // Chunk-based pixel reveal
+        // Smooth fade-in from black for first image
         let firstImageLoaded = false;
 
         function createPixelReveal() {
@@ -820,6 +872,7 @@
             }
             firstImageLoaded = true;
             
+            // Simple black overlay that fades out
             canvas.width = showcase.offsetWidth;
             canvas.height = showcase.offsetHeight;
             
@@ -827,64 +880,18 @@
             ctx.fillStyle = '#000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            const chunksAcross = 25;
-            const CHUNK = Math.floor(canvas.width / chunksAcross);
-            const cols = chunksAcross;
-            const rows = Math.floor(canvas.height / CHUNK);
-            
-            const chunks = [];
-            for (let r = 0; r < rows; r++) {
-                for (let c = 0; c < cols; c++) {
-                    const cy = r * CHUNK;
-                    const cx = c * CHUNK;
-                    const rowProgress = cy / (rows * CHUNK);
-                    const colStagger = (c / cols) * 0.15;
-                    const rowJitter = ((c * 7 + r * 13) % 11) / 11 * 0.08;
-                    
-                    chunks.push({
-                        cx: cx,
-                        cy: cy,
-                        revealAt: rowProgress + colStagger + rowJitter
-                    });
-                }
-            }
-            
-            chunks.sort((a, b) => a.revealAt - b.revealAt);
-            
-            let startTime = performance.now();
-            canvas.style.opacity = '1';
             canvas.style.display = 'block';
+            canvas.style.opacity = '1';
             
-            function animate(now) {
-                const elapsed = now - startTime;
-                const TOTAL_TIME = 4000;
-                const progress = Math.min(elapsed / TOTAL_TIME, 1);
+            // Fade out the black overlay
+            setTimeout(() => {
+                canvas.style.transition = 'opacity 1.5s ease';
+                canvas.style.opacity = '0';
                 
-                ctx.fillStyle = '#000';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.globalCompositeOperation = 'destination-out';
-                ctx.fillStyle = 'rgba(0,0,0,1)';
-                
-                chunks.forEach(chunk => {
-                    if (progress >= chunk.revealAt) {
-                        ctx.fillRect(chunk.cx, chunk.cy, CHUNK, CHUNK);
-                    }
-                });
-                
-                ctx.globalCompositeOperation = 'source-over';
-                
-                if (progress < 1) {
-                    requestAnimationFrame(animate);
-                } else {
-                    canvas.style.transition = 'opacity 0.3s ease';
-                    canvas.style.opacity = '0';
-                    setTimeout(() => {
-                        canvas.style.display = 'none';
-                    }, 300);
-                }
-            }
-            
-            requestAnimationFrame(animate);
+                setTimeout(() => {
+                    canvas.style.display = 'none';
+                }, 1500);
+            }, 100);
         }
 
         populateGallery();

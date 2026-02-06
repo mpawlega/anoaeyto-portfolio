@@ -31,7 +31,7 @@
 
         .text {
             display:flex; align-items:center; white-space:nowrap;
-            cursor:pointer; font-size:140px; font-weight:bold;
+            cursor:pointer; font-size:140px; font-weight:100;
             color:white; letter-spacing:2px;
             -webkit-font-smoothing:antialiased;
             text-rendering:optimizeLegibility;
@@ -85,12 +85,12 @@
 const GRID_BASE_SIZE        = 40;
 const GRID_SUB_SIZE         = 20;   // GRID_BASE_SIZE / 2
 
-const REVEAL_DELAY          = 500;
-const REVEAL_START_DELAY    = 2500;
+const REVEAL_DELAY          = 450;
+const REVEAL_START_DELAY    = 5000;
 const DRIFT_START_DELAY     = 15000;
 const DRIFT_STAGGER_DELAY   = 150;
-const AUTO_RETURN_DELAY     = 20000;
-const HOVER_ENLARGE_DELAY   = 350;     // ms cursor must sit on a letter
+const AUTO_RETURN_DELAY     = 100;
+const HOVER_ENLARGE_DELAY   = 25;     // ms cursor must sit on a letter
 // ============================================================
 
 const RETURN_LERP           = 0.025;
@@ -150,7 +150,8 @@ word.split('').forEach((char) => {
     // don't fire when an element slides under a stationary cursor)
     textElement.appendChild(span);
     letters.push(span);
-    letterState.push({ t:0, x:0, y:0, rot:0, returning:false, drifting:false });
+    letterState.push({ t:0, x:0, y:0, rot:0, returning:false, drifting:false, easing:false });
+
 });
 
 // Lock width
@@ -190,23 +191,25 @@ function generateSpiralConfigs() {
 
 // ─── reveal ─────────────────────────────────────────────────
 let revealIdx = 0;
-(function revealNext() {
-    if (revealIdx < letters.length) {
-        letters[revealIdx].classList.add('visible');
-        revealIdx++;
-        setTimeout(revealNext, REVEAL_DELAY);
-    } else {
-        textElement.classList.add('interactive');
-        startGlitchEffects();
-        generateSpiralConfigs();
-        revealDone = true;
-        setTimeout(() => {
-            physicsActive = true;
-            startSmoothDrift();
-            scheduleAutoReturn();
-        }, DRIFT_START_DELAY);
-    }
-})();
+setTimeout(() => {  // ADD THIS
+    (function revealNext() {
+        if (revealIdx < letters.length) {
+            letters[revealIdx].classList.add('visible');
+            revealIdx++;
+            setTimeout(revealNext, REVEAL_DELAY);
+        } else {
+            textElement.classList.add('interactive');
+            startGlitchEffects();
+            generateSpiralConfigs();
+            revealDone = true;
+            setTimeout(() => {
+                physicsActive = true;
+                startSmoothDrift();
+                scheduleAutoReturn();
+            }, DRIFT_START_DELAY);
+        }
+    })();
+}, 1500); 
 
 // ─── drift lifecycle ────────────────────────────────────────
 function startSmoothDrift() {
@@ -291,28 +294,55 @@ function updateLetterPhysics(now) {
         const cfg = spiralConfigs[idx];
 
         if (mouseIsNear) {
-            s.returning = true;
-            s.drifting  = false;
-            s.x   += (0 - s.x)   * RETURN_LERP;
-            s.y   += (0 - s.y)   * RETURN_LERP;
-            s.rot += (0 - s.rot) * RETURN_LERP;
-            if (Math.abs(s.x) < 0.5 && Math.abs(s.y) < 0.5) {
-                s.x=0; s.y=0; s.rot=0; s.t=0;
-                s.returning = false;
-            }
-            scheduleAutoReturn();
-        } else {
-            s.returning = false;
-
-            if (s.drifting) {
-                const targetT = Math.min(s.t + DRIFT_SPEED * 60, 1);
-                s.t += (targetT - s.t) * 0.04;
-                const pos = getSpiralPos(cfg, s.t);
-                s.x   += (pos.x   - s.x)   * 0.05;
-                s.y   += (pos.y   - s.y)   * 0.05;
-                s.rot += (pos.rot - s.rot) * 0.05;
+         s.returning = true;
+        s.drifting  = false;
+    s.x   += (0 - s.x)   * RETURN_LERP;
+    s.y   += (0 - s.y)   * RETURN_LERP;
+    s.rot += (0 - s.rot) * RETURN_LERP;
+    if (Math.abs(s.x) < 0.5 && Math.abs(s.y) < 0.5) {
+        s.x=0; s.y=0; s.rot=0; s.t=0;
+        s.returning = false;
+    }
+    scheduleAutoReturn();
+} else {
+    // If we were returning but didn't make it home, resume drifting from current position
+    if (s.returning) {
+        s.returning = false;
+        s.drifting = true;
+        s.easing = true;  // Mark as easing back into drift
+        
+        // Find the t value on the spiral that's closest to current position
+        let bestT = s.t;
+        let bestDist = Infinity;
+        for (let testT = 0; testT <= 1; testT += 0.01) {
+            const pos = getSpiralPos(cfg, testT);
+            const dist = Math.sqrt((pos.x - s.x)**2 + (pos.y - s.y)**2);
+            if (dist < bestDist) {
+                bestDist = dist;
+                bestT = testT;
             }
         }
+        s.t = bestT;
+    }
+    
+    if (s.drifting) {
+        const targetT = Math.min(s.t + DRIFT_SPEED * 60, 1);
+        s.t += (targetT - s.t) * 0.04;
+        const pos = getSpiralPos(cfg, s.t);
+        
+        // Use slower lerp when easing back, faster when normal drifting
+        const lerpSpeed = s.easing ? 0.015 : 0.05;  // Slower during ease-in
+        s.x   += (pos.x   - s.x)   * lerpSpeed;
+        s.y   += (pos.y   - s.y)   * lerpSpeed;
+        s.rot += (pos.rot - s.rot) * lerpSpeed;
+        
+        // Once close to target, stop easing
+        const dist = Math.sqrt((pos.x - s.x)**2 + (pos.y - s.y)**2);
+        if (s.easing && dist < 5) {
+            s.easing = false;
+        }
+    }
+}
 
         // Collision avoidance — advances along spiral path
         if (!s.returning && s.drifting) {
@@ -369,10 +399,16 @@ class PerlinNoise {
 // Click: stroke flash then random-walk flood fill
 // ============================================================
 function handleClick() {
+    // Check if all letters are at home position
+    const allHome = letterState.every(s => Math.abs(s.x) < 1 && Math.abs(s.y) < 1);
+    if (!allHome) return; // Don't allow click if letters aren't home
+    
     textElement.removeEventListener('click', handleClick);
     textElement.style.pointerEvents = 'none';
     randomWalkTransition();
 }
+
+
 textElement.addEventListener('click', handleClick);
 
 function randomWalkTransition() {
@@ -382,7 +418,7 @@ function randomWalkTransition() {
     canvas.height = window.innerHeight;
     canvas.style.opacity = '1';
 
-    const ps   = GRID_SUB_SIZE;
+    const ps   = GRID_SUB_SIZE/2;
     const cols = Math.ceil(canvas.width/ps)+1;
     const rows = Math.ceil(canvas.height/ps)+1;
     const cx   = Math.floor(canvas.width/2/ps);
@@ -433,7 +469,7 @@ function randomWalkTransition() {
     }
 
     const startTime   = performance.now();
-    const TOTAL_TIME  = 1200;
+    const TOTAL_TIME  = 1000;
 
     function animate(now) {
         const progress   = Math.min((now-startTime)/TOTAL_TIME, 1);
